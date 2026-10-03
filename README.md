@@ -53,7 +53,7 @@ Leads and history stay safe either way.
 
 - CRM: this repository.
 - Landing page: the change is in [`landing-page/creart-workshops.patch`](landing-page/creart-workshops.patch).
-  It only changes the bottom `<script>` part of `index.html` (see section 6).
+  It only changes the bottom `<script>` part of `index.html` (see section 6). The Supabase URL and publishable key are already filled in.
 
 ## 4. Deploy on Vercel
 

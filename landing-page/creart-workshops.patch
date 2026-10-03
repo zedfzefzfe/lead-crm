@@ -1,4 +1,4 @@
-From 941993d3bc97dd718bc080d42ba390bbb6344d90 Mon Sep 17 00:00:00 2001
+From 2398ec4998175841e65e3f7f9420e31b39903c99 Mon Sep 17 00:00:00 2001
 From: Claude <noreply@anthropic.com>
 Date: Sat, 3 Oct 2026 14:24:55 +0000
 Subject: [PATCH] Save landing page bookings to the Crea'rt CRM (Supabase)
@@ -15,7 +15,7 @@ Claude-Session: https://claude.ai/code/session_01FiPmDsHajZQwpj1tLywj9x
  1 file changed, 18 insertions(+), 1 deletion(-)
 
 diff --git a/index.html b/index.html
-index 000f909..abcaff2 100644
+index 000f909..7daa921 100644
 --- a/index.html
 +++ b/index.html
 @@ -713,6 +713,7 @@ Une question, un besoin particulier…" data-i18n-ph="ph.msg"></textarea></div>
@@ -33,7 +33,7 @@ index 000f909..abcaff2 100644
 -  videoUrl: ""                          // lien de la vidéo (Instagram, YouTube…) ouvert par le bouton lecture
 +  videoUrl: "",                         // lien de la vidéo (Instagram, YouTube…) ouvert par le bouton lecture
 +  // CRM Supabase : URL du projet + clé publique "anon" (jamais la clé service_role)
-+  supabase: { url: "PASTE_SUPABASE_URL", anonKey: "PASTE_ANON_KEY", atelier: "Bougies Casa 17 Oct" }
++  supabase: { url: "https://shudwpehmotlgocrhrbo.supabase.co", anonKey: "sb_publishable_BTfHN9iSWtQu2-yOHsjCSQ_J_vVyv-O", atelier: "Bougies Casa 17 Oct" }
  };
  /* ============================= */
  
