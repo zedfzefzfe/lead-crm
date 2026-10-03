@@ -1,0 +1,70 @@
+From 941993d3bc97dd718bc080d42ba390bbb6344d90 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Sat, 3 Oct 2026 14:24:55 +0000
+Subject: [PATCH] Save landing page bookings to the Crea'rt CRM (Supabase)
+
+After the EmailJS success callback and the Meta Pixel Lead event, the lead
+(nom, telephone, ville, source=landing, atelier) is also inserted into the
+Supabase leads table with the anon key. Fire-and-forget: errors are only
+logged and never block EmailJS, the pixel or the thank-you screen.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01FiPmDsHajZQwpj1tLywj9x
+---
+ index.html | 19 ++++++++++++++++++-
+ 1 file changed, 18 insertions(+), 1 deletion(-)
+
+diff --git a/index.html b/index.html
+index 000f909..abcaff2 100644
+--- a/index.html
++++ b/index.html
+@@ -713,6 +713,7 @@ Une question, un besoin particulier…" data-i18n-ph="ph.msg"></textarea></div>
+ <a class="book-float" id="bookFloat" href="#reserver" data-i18n="cta.float">Réservez votre place 🕯️</a>
+ 
+ <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
++<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+ <script>
+ /* ====== TRADUCTIONS (FR · AR · EN) ======
+    Langue choisie automatiquement : lien avec #ar / #fr / #en, sinon choix déjà fait par la visiteuse,
+@@ -914,7 +915,9 @@ const CONFIG = {
+   whatsappDisplay: "+212 7 08 75 93 10",
+   // EmailJS : collez ici vos 3 clés (emailjs.com > Account / Email Services / Email Templates)
+   emailjs: { publicKey: "aZx0Zi9K5AAcRkQsH", serviceId: "service_bv1wwh7", templateId: "template_1wkxe8d" }, // affichage lisible
+-  videoUrl: ""                          // lien de la vidéo (Instagram, YouTube…) ouvert par le bouton lecture
++  videoUrl: "",                         // lien de la vidéo (Instagram, YouTube…) ouvert par le bouton lecture
++  // CRM Supabase : URL du projet + clé publique "anon" (jamais la clé service_role)
++  supabase: { url: "PASTE_SUPABASE_URL", anonKey: "PASTE_ANON_KEY", atelier: "Bougies Casa 17 Oct" }
+ };
+ /* ============================= */
+ 
+@@ -973,6 +976,19 @@ document.addEventListener('click', function (e) {
+   if (a && typeof fbq === 'function') { fbq('track', 'Contact'); }
+ }, true);
+ 
++// CRM: save the booking in Supabase. Fire-and-forget: any error is only logged,
++// so it never blocks EmailJS, the Pixel or the thank-you screen.
++function saveLeadToCRM(nom, telephone, ville){
++  try {
++    const sb = CONFIG.supabase;
++    if (!window.supabase || !sb.url || !sb.anonKey || sb.url.indexOf('PASTE_') === 0) return;
++    if (!window._crm) window._crm = window.supabase.createClient(sb.url, sb.anonKey, { auth: { persistSession: false } });
++    window._crm.from('leads')
++      .insert({ nom: nom, telephone: telephone, ville: ville, source: 'landing', atelier: sb.atelier })
++      .then(function (res) { if (res.error) console.warn('CRM', res.error); }, function (err) { console.warn('CRM', err); });
++  } catch (err) { console.warn('CRM', err); }
++}
++
+ // Form
+ const form = document.getElementById('regForm');
+ function setErr(input, msg){
+@@ -1000,6 +1016,7 @@ form.addEventListener('submit', e => {
+         language: LANG, date: new Date().toLocaleString('fr-FR', {timeZone: 'Africa/Casablanca'})
+       }, {publicKey: ej.publicKey}).then(function () {
+         if (typeof fbq === 'function') { fbq('track', 'Lead', { content_name: 'Atelier Bougies Casa 17 Oct' }); }
++        saveLeadToCRM(name, phone, city);
+       }, function (err) { console.warn('EmailJS', err); });
+     } catch (err) { console.warn('EmailJS', err); }
+   }
+-- 
+2.43.0
+
