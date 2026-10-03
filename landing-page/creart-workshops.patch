@@ -1,28 +1,12 @@
-From 2398ec4998175841e65e3f7f9420e31b39903c99 Mon Sep 17 00:00:00 2001
-From: Claude <noreply@anthropic.com>
-Date: Sat, 3 Oct 2026 14:24:55 +0000
-Subject: [PATCH] Save landing page bookings to the Crea'rt CRM (Supabase)
-
-After the EmailJS success callback and the Meta Pixel Lead event, the lead
-(nom, telephone, ville, source=landing, atelier) is also inserted into the
-Supabase leads table with the anon key. Fire-and-forget: errors are only
-logged and never block EmailJS, the pixel or the thank-you screen.
-
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
-Claude-Session: https://claude.ai/code/session_01FiPmDsHajZQwpj1tLywj9x
----
- index.html | 19 ++++++++++++++++++-
- 1 file changed, 18 insertions(+), 1 deletion(-)
-
 diff --git a/index.html b/index.html
-index 000f909..7daa921 100644
+index 000f909..533e099 100644
 --- a/index.html
 +++ b/index.html
 @@ -713,6 +713,7 @@ Une question, un besoin particulier…" data-i18n-ph="ph.msg"></textarea></div>
  <a class="book-float" id="bookFloat" href="#reserver" data-i18n="cta.float">Réservez votre place 🕯️</a>
  
  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
++<script async src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
  <script>
  /* ====== TRADUCTIONS (FR · AR · EN) ======
     Langue choisie automatiquement : lien avec #ar / #fr / #en, sinon choix déjà fait par la visiteuse,
@@ -65,6 +49,3 @@ index 000f909..7daa921 100644
        }, function (err) { console.warn('EmailJS', err); });
      } catch (err) { console.warn('EmailJS', err); }
    }
--- 
-2.43.0
-
