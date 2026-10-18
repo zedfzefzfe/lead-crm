@@ -40,4 +40,4 @@ export const FIELD_LABELS = {
   notes: 'Notes',
 }
 
-export const DEFAULT_ATELIER = 'Bougies Casa 17 Oct'
+export const DEFAULT_ATELIER = 'Bougies Casa 31 Oct'

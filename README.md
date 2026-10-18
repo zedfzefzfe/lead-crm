@@ -83,7 +83,7 @@ npm run dev
 2. ☐ Open the CRM on a phone and log in with account B (for example the assistant). Go to **Leads**.
 3. ☐ On a third tab or device, open `creart-workshops.vercel.app` and submit the form with a test name and phone number.
 4. ☐ Within a few seconds, the lead shows up on **both** screens without refreshing, with a "Nouveau lead : …" notification.
-   It has source *Landing page*, atelier *Bougies Casa 17 Oct* and status *Nouveau*.
+   It has source *Landing page*, atelier *Bougies Casa 31 Oct* and status *Nouveau*.
 5. ☐ Check that the EmailJS email still arrives, the thank-you message still shows, and the Meta Pixel `Lead` event still fires (Meta Events Manager → Test events, or the Pixel Helper extension).
 6. ☐ On device A, open the lead and change its status to *Intéressée*, then add a note.
 7. ☐ On device B, the badge, the counts and the history update right away. The history says who changed what and when.
@@ -99,7 +99,7 @@ Three additions to `index.html`. EmailJS, the Pixel, the `Lead` event and the de
 
 1. The Supabase library is loaded from the CDN, next to EmailJS:
    `<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>`
-2. `CONFIG.supabase = { url, anonKey, atelier: "Bougies Casa 17 Oct" }`. **Paste your URL and anon key here.**
+2. `CONFIG.supabase = { url, anonKey, atelier: "Bougies Casa 31 Oct" }`. **Paste your URL and anon key here.**
    Until you do, the landing page works exactly as before and skips the CRM.
 3. A `saveLeadToCRM(name, phone, city)` function, called in the EmailJS success callback right after `fbq('track','Lead')`.
    It runs in the background, and every error is caught and only written to the console.
