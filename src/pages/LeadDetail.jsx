@@ -34,6 +34,7 @@ export default function LeadDetail() {
             {lead.telephone}{lead.ville ? ` · ${lead.ville}` : ''} · {SOURCE_LABELS[lead.source]}
           </p>
           {lead.atelier && <p className="text-sm mt-1">Atelier : <b className="font-medium">{lead.atelier}</b></p>}
+          {lead.contact_pref && <p className="text-sm mt-1">Préfère : <b className="font-medium">{lead.contact_pref}</b></p>}
         </div>
         <StatusBadge statut={lead.statut} />
       </div>
