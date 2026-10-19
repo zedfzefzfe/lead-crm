@@ -16,6 +16,7 @@ export default function LeadCard({ lead, extra }) {
       </div>
       <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted">
         {lead.atelier && <span>{lead.atelier}</span>}
+        {lead.contact_pref && <span>Contact : {lead.contact_pref}</span>}
         <span>{SOURCE_LABELS[lead.source]}</span>
         <span>{formatDate(lead.created_at)}</span>
         {extra}

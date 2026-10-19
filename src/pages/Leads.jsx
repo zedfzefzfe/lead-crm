@@ -102,6 +102,7 @@ export default function Leads() {
                 <th className="px-4 py-3 font-medium">Téléphone</th>
                 <th className="px-4 py-3 font-medium">Ville</th>
                 <th className="px-4 py-3 font-medium">Atelier</th>
+                <th className="px-4 py-3 font-medium">Contact</th>
                 <th className="px-4 py-3 font-medium">Source</th>
                 <th className="px-4 py-3 font-medium">Statut</th>
                 <th className="px-4 py-3 font-medium text-right">Acompte</th>
@@ -116,6 +117,7 @@ export default function Leads() {
                   <td className="px-4 py-3 whitespace-nowrap">{l.telephone}</td>
                   <td className="px-4 py-3">{l.ville}</td>
                   <td className="px-4 py-3">{l.atelier}</td>
+                  <td className="px-4 py-3">{l.contact_pref || '—'}</td>
                   <td className="px-4 py-3">{SOURCE_LABELS[l.source]}</td>
                   <td className="px-4 py-3"><StatusBadge statut={l.statut} /></td>
                   <td className="px-4 py-3 text-right whitespace-nowrap">{l.montant_acompte > 0 ? formatMAD(l.montant_acompte) : '—'}</td>
