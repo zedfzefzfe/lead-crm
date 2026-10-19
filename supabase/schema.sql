@@ -148,3 +148,28 @@ begin
   end if;
 end;
 $$;
+
+-- ---------- 5. Contact preference (landing page pop-up) ------------------
+
+alter table public.leads add column if not exists contact_pref text
+  check (contact_pref in ('Appel maintenant', 'Appel ce soir', 'Appel demain matin', 'WhatsApp'));
+
+-- The landing page (anonymous) cannot read or update leads. This function lets it set
+-- contact_pref only, once, only on a lead created in the last hour, and only if it knows
+-- that lead's id (a random id the page itself generated when it inserted the lead).
+create or replace function public.set_contact_pref(p_id uuid, p_pref text)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  update leads set contact_pref = p_pref
+   where id = p_id
+     and contact_pref is null
+     and created_at > now() - interval '1 hour';
+end;
+$$;
+
+revoke all on function public.set_contact_pref(uuid, text) from public;
+grant execute on function public.set_contact_pref(uuid, text) to anon, authenticated;
