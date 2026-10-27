@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useLeads } from '../lib/leads'
-import { EXTRA_FIELDS, ITEM, STATUTS, SOURCES, SOURCE_LABELS } from '../lib/constants'
+import { CLIENT, EXTRA_FIELDS, ITEM, STATUTS, SOURCES, SOURCE_LABELS } from '../lib/constants'
 import { formatDate, formatMAD, toISODate } from '../lib/format'
 import StatusBadge from '../components/StatusBadge'
 import LeadCard from '../components/LeadCard'
@@ -103,7 +103,7 @@ export default function Leads() {
                 <th className="px-4 py-3 font-medium">Ville</th>
                 <th className="px-4 py-3 font-medium">{ITEM.label}</th>
                 {EXTRA_FIELDS.map((x) => <th key={x.key} className="px-4 py-3 font-medium">{x.label}</th>)}
-                <th className="px-4 py-3 font-medium">Contact</th>
+                {CLIENT.showContactPref && <th className="px-4 py-3 font-medium">Contact</th>}
                 <th className="px-4 py-3 font-medium">Source</th>
                 <th className="px-4 py-3 font-medium">Statut</th>
                 <th className="px-4 py-3 font-medium text-right">Acompte</th>
@@ -119,7 +119,7 @@ export default function Leads() {
                   <td className="px-4 py-3">{l.ville}</td>
                   <td className="px-4 py-3">{l[ITEM.key]}</td>
                   {EXTRA_FIELDS.map((x) => <td key={x.key} className="px-4 py-3">{l[x.key] || '—'}</td>)}
-                  <td className="px-4 py-3">{l.contact_pref || '—'}</td>
+                  {CLIENT.showContactPref && <td className="px-4 py-3">{l.contact_pref || '—'}</td>}
                   <td className="px-4 py-3">{SOURCE_LABELS[l.source]}</td>
                   <td className="px-4 py-3"><StatusBadge statut={l.statut} /></td>
                   <td className="px-4 py-3 text-right whitespace-nowrap">{l.montant_acompte > 0 ? formatMAD(l.montant_acompte) : '—'}</td>

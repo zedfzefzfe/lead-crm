@@ -40,6 +40,7 @@ export default {
   },
   extraFields: [{ key: 'paiement', label: 'Paiement', options: ['Au comptant', 'Crédit à 0 %'] }],
   showAcompte: true,
+  showContactPref: false,
 
   whatsappMessage: (prenom, item) =>
     `Salam ${prenom} 👋\n` +
