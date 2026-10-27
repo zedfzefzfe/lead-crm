@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useLeads } from '../lib/leads'
-import { STATUTS, STATUT_STYLES, SOURCE_LABELS } from '../lib/constants'
+import { CLIENT, EXTRA_FIELDS, ITEM, STATUTS, STATUT_STYLES, SOURCE_LABELS } from '../lib/constants'
 import { formatMAD } from '../lib/format'
 
 function startOfToday() {
@@ -37,7 +37,7 @@ export default function Dashboard() {
   if (error) return <p className="text-red-600">Erreur : {error}</p>
 
   const since = (date) => leads.filter((l) => new Date(l.created_at) >= date).length
-  const won = leads.filter((l) => l.statut === 'Acompte payé' || l.statut === 'Confirmée').length
+  const won = leads.filter((l) => CLIENT.won.includes(l.statut)).length
   const conversion = leads.length ? Math.round((won / leads.length) * 100) : 0
   const deposits = leads.reduce((sum, l) => sum + Number(l.montant_acompte || 0), 0)
   const perStatut = Object.fromEntries(STATUTS.map((s) => [s, 0]))
@@ -55,7 +55,7 @@ export default function Dashboard() {
       </section>
 
       <section className="mt-3 grid grid-cols-2 gap-3">
-        <Kpi label="Taux de conversion" value={`${conversion} %`} hint="Acompte payé + Confirmée" gold />
+        <Kpi label="Taux de conversion" value={`${conversion} %`} hint={CLIENT.won.join(' + ')} gold />
         <Kpi label="Acomptes encaissés" value={formatMAD(deposits)} gold />
       </section>
 
@@ -70,13 +70,16 @@ export default function Dashboard() {
         ))}
       </section>
 
-      <section className="mt-8 grid gap-4 md:grid-cols-3">
+      <section className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         <Breakdown title="Par source" rows={countBy(leads, 'source').map(([k, v]) => [SOURCE_LABELS[k] || k, v])} total={leads.length} />
-        <Breakdown title="Par atelier" rows={countBy(leads, 'atelier')} total={leads.length} />
+        <Breakdown title={`Par ${ITEM.label.toLowerCase()}`} rows={countBy(leads, ITEM.key)} total={leads.length} />
+        {EXTRA_FIELDS.map((x) => (
+          <Breakdown key={x.key} title={`Par ${x.label.toLowerCase()}`} rows={countBy(leads, x.key)} total={leads.length} />
+        ))}
         <Breakdown
           title="Raisons des leads perdus"
-          rows={countBy(leads.filter((l) => l.statut === 'Perdue'), 'raison')}
-          total={perStatut['Perdue']}
+          rows={countBy(leads.filter((l) => l.statut === CLIENT.lost), 'raison')}
+          total={perStatut[CLIENT.lost]}
           empty="Aucun lead perdu"
         />
       </section>

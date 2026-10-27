@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { supabase } from '../lib/supabase'
+import { CLIENT } from '../lib/constants'
 
 // Accounts are created by the admin in Supabase — there is no sign-up here.
 export default function Login() {
@@ -20,8 +21,8 @@ export default function Login() {
   return (
     <div className="min-h-screen grid place-items-center px-5 bg-gradient-to-b from-cream to-sand">
       <form onSubmit={submit} className="card w-full max-w-sm p-8">
-        <p className="font-serif text-4xl text-center">Crea'rt</p>
-        <p className="text-center text-[10px] uppercase tracking-[0.3em] text-gold mb-8">Workshops · CRM</p>
+        <p className="font-serif text-4xl text-center">{CLIENT.brand.name}</p>
+        <p className="text-center text-[10px] uppercase tracking-[0.3em] text-gold mb-8">{CLIENT.brand.tagline}</p>
 
         <label className="label" htmlFor="email">Email</label>
         <input id="email" type="email" autoComplete="email" required className="input mb-4"

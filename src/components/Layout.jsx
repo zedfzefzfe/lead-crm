@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useLeads } from '../lib/leads'
+import { CLIENT } from '../lib/constants'
 import { useRelances } from '../pages/Relances'
 import Toasts from './Toasts'
 
@@ -96,8 +97,8 @@ export default function Layout({ user, children }) {
 function Brand() {
   return (
     <div>
-      <p className="font-serif text-2xl leading-none text-ink">Crea'rt</p>
-      <p className="text-[10px] uppercase tracking-[0.25em] text-gold">Workshops · CRM</p>
+      <p className="font-serif text-2xl leading-none text-ink">{CLIENT.brand.name}</p>
+      <p className="text-[10px] uppercase tracking-[0.25em] text-gold">{CLIENT.brand.tagline}</p>
     </div>
   )
 }

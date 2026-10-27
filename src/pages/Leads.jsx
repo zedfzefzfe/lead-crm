@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useLeads } from '../lib/leads'
-import { STATUTS, SOURCES, SOURCE_LABELS } from '../lib/constants'
+import { EXTRA_FIELDS, ITEM, STATUTS, SOURCES, SOURCE_LABELS } from '../lib/constants'
 import { formatDate, formatMAD, toISODate } from '../lib/format'
 import StatusBadge from '../components/StatusBadge'
 import LeadCard from '../components/LeadCard'
@@ -21,14 +21,14 @@ export default function Leads() {
     setParams(next, { replace: true })
   }
 
-  const ateliers = useMemo(() => [...new Set(leads.map((l) => l.atelier).filter(Boolean))].sort(), [leads])
+  const items = useMemo(() => [...new Set(leads.map((l) => l[ITEM.key]).filter(Boolean))].sort(), [leads])
 
   const filtered = useMemo(() => {
     const q = f.q.toLowerCase().trim()
     const qDigits = q.replace(/\D/g, '')
     return leads.filter((l) => {
       if (f.statut && l.statut !== f.statut) return false
-      if (f.atelier && l.atelier !== f.atelier) return false
+      if (f.atelier && l[ITEM.key] !== f.atelier) return false
       if (f.source && l.source !== f.source) return false
       const day = toISODate(new Date(l.created_at)) // local day
       if (f.du && day < f.du) return false
@@ -66,8 +66,8 @@ export default function Leads() {
           {SOURCES.map((s) => <option key={s} value={s}>{SOURCE_LABELS[s]}</option>)}
         </select>
         <select className="input col-span-2" value={f.atelier} onChange={(e) => setFilter('atelier', e.target.value)}>
-          <option value="">Tous ateliers</option>
-          {ateliers.map((a) => <option key={a}>{a}</option>)}
+          <option value="">{`Tous ${ITEM.plural}`}</option>
+          {items.map((a) => <option key={a}>{a}</option>)}
         </select>
         <label className="text-xs text-muted md:col-span-1">Du
           <input type="date" className="input mt-1" value={f.du} onChange={(e) => setFilter('du', e.target.value)} />
@@ -101,7 +101,8 @@ export default function Leads() {
                 <th className="px-4 py-3 font-medium">Nom</th>
                 <th className="px-4 py-3 font-medium">Téléphone</th>
                 <th className="px-4 py-3 font-medium">Ville</th>
-                <th className="px-4 py-3 font-medium">Atelier</th>
+                <th className="px-4 py-3 font-medium">{ITEM.label}</th>
+                {EXTRA_FIELDS.map((x) => <th key={x.key} className="px-4 py-3 font-medium">{x.label}</th>)}
                 <th className="px-4 py-3 font-medium">Contact</th>
                 <th className="px-4 py-3 font-medium">Source</th>
                 <th className="px-4 py-3 font-medium">Statut</th>
@@ -116,7 +117,8 @@ export default function Leads() {
                   <td className="px-4 py-3 font-medium">{l.nom}</td>
                   <td className="px-4 py-3 whitespace-nowrap">{l.telephone}</td>
                   <td className="px-4 py-3">{l.ville}</td>
-                  <td className="px-4 py-3">{l.atelier}</td>
+                  <td className="px-4 py-3">{l[ITEM.key]}</td>
+                  {EXTRA_FIELDS.map((x) => <td key={x.key} className="px-4 py-3">{l[x.key] || '—'}</td>)}
                   <td className="px-4 py-3">{l.contact_pref || '—'}</td>
                   <td className="px-4 py-3">{SOURCE_LABELS[l.source]}</td>
                   <td className="px-4 py-3"><StatusBadge statut={l.statut} /></td>

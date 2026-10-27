@@ -1,3 +1,5 @@
+import { CLIENT, ITEM } from './constants'
+
 // Small helpers shared by the pages.
 
 export function todayISO() {
@@ -42,11 +44,7 @@ export function toWhatsAppNumber(phone) {
 
 export function whatsappLink(lead) {
   const prenom = (lead.nom || '').trim().split(/\s+/)[0]
-  const atelier = lead.atelier ? `l'atelier ${lead.atelier}` : 'nos ateliers'
-  const message =
-    `Salam ${prenom} 😊\n` +
-    `C'est Crea'rt Workshops. Merci pour votre intérêt pour ${atelier} ✨\n` +
-    `Wach ba9i mhtama? Nqdro nkmlo l'inscription dyalk w njawbk 3la ay so2al 🌸`
+  const message = CLIENT.whatsappMessage(prenom, lead[ITEM.key])
   return `https://wa.me/${toWhatsAppNumber(lead.telephone)}?text=${encodeURIComponent(message)}`
 }
 

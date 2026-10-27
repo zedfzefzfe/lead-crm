@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import StatusBadge from './StatusBadge'
-import { SOURCE_LABELS } from '../lib/constants'
+import { EXTRA_FIELDS, ITEM, SOURCE_LABELS } from '../lib/constants'
 import { formatDate } from '../lib/format'
 
 // Compact lead card used on mobile and on the "À relancer" page.
@@ -15,7 +15,8 @@ export default function LeadCard({ lead, extra }) {
         <StatusBadge statut={lead.statut} />
       </div>
       <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted">
-        {lead.atelier && <span>{lead.atelier}</span>}
+        {lead[ITEM.key] && <span>{lead[ITEM.key]}</span>}
+        {EXTRA_FIELDS.map((x) => lead[x.key] && <span key={x.key}>{lead[x.key]}</span>)}
         {lead.contact_pref && <span>Contact : {lead.contact_pref}</span>}
         <span>{SOURCE_LABELS[lead.source]}</span>
         <span>{formatDate(lead.created_at)}</span>

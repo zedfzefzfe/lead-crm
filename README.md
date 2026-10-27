@@ -1,16 +1,20 @@
-# Crea'rt Workshops — CRM
+# Lead CRM — Crea'rt Workshops & Bajaj Maroc
 
-A small CRM for Crea'rt Workshops leads (landing page, WhatsApp, Instagram).
+A small CRM for website / WhatsApp / Instagram leads. One codebase, deployed once per client
+(each client has its own Supabase database, its own Vercel link and its own logins — data never mixes).
 It updates in real time: when one person changes a lead, everyone else sees the change right away.
 
 **Stack:** React + Vite + Tailwind CSS · Supabase (Postgres, Auth, Realtime) · Vercel
 
 ```
-supabase/schema.sql      ← the SQL to run once in Supabase
+supabase/schema.sql      ← the SQL to run once in Supabase (Crea'rt)
+supabase/schema-bajaj.sql← the SQL for the Bajaj Maroc database
 src/
+  clients/creart.js      ← everything client-specific: name, colours, statuses, reasons,
+  clients/bajaj.js          item field (atelier / modèle), extra fields, WhatsApp message
   lib/supabase.js        ← Supabase client (reads the 2 env variables)
   lib/leads.jsx          ← loads leads + realtime sync + "new lead" notification
-  lib/constants.js       ← statuses, reasons, sources, badge colours, default atelier
+  lib/constants.js       ← reads the active client config (VITE_CLIENT)
   lib/format.js          ← dates, DH amounts, tel: / WhatsApp links
   components/            ← Layout (menu), StatusBadge, LeadCard, Toasts
   pages/                 ← Login, Dashboard, Leads, LeadDetail, Relances, AddLead
@@ -108,4 +112,25 @@ Three additions to `index.html`. EmailJS, the Pixel, the `Lead` event and the de
 To apply the patch by hand: in a clone of `creart-workshops`, run `git apply path/to/creart-workshops.patch`, then commit and push.
 
 When you run a new atelier, change `atelier` in `CONFIG.supabase` on the landing page.
-In the CRM, also change `DEFAULT_ATELIER` in `src/lib/constants.js` (the pre-filled value on "Ajouter un lead").
+In the CRM, also change `item.default` in `src/clients/creart.js` (the pre-filled value on "Ajouter un lead").
+
+## 7. Bajaj Maroc (second client)
+
+Same code, a second deployment. Differences live in [`src/clients/bajaj.js`](src/clients/bajaj.js):
+Bajaj blue branding; statuses *Nouveau, Contacté, Pas de réponse, Intéressé, Essai programmé, Vendu, Perdu*;
+conversion = Vendu ÷ total; a **Modèle** field (instead of Atelier) and a **Paiement** field (Au comptant / Crédit à 0 %).
+
+1. **Supabase:** create a new project (e.g. `bajaj-crm`), then run [`supabase/schema-bajaj.sql`](supabase/schema-bajaj.sql) in the SQL Editor.
+   Create the sales team accounts (Authentication → Users → Add user, *Auto Confirm*), then turn off "Allow new users to sign up".
+2. **Vercel:** Add New → Project → import this same repository again (name it e.g. `bajaj-crm`), with 3 environment variables:
+   | Key | Value |
+   |---|---|
+   | `VITE_CLIENT` | `bajaj` |
+   | `VITE_SUPABASE_URL` | the Bajaj project URL |
+   | `VITE_SUPABASE_ANON_KEY` | the Bajaj publishable / anon key |
+   Then turn off Settings → Deployment Protection.
+3. **Website (`bajajmaroc` repo):** the "Réservez votre essai" form on `/test-ride/` calls `bjSaveLead(...)` from
+   [`assets/crm/crm-lead.js`](https://github.com/zedfzefzfe/bajajmaroc/blob/main/assets/crm/crm-lead.js) right after the Pixel `Lead` event.
+   Put the Bajaj Supabase URL and publishable key at the top of that file. It sends nom (prénom + nom), téléphone, modèle,
+   paiement and source = landing. Fire-and-forget: errors are only logged, EmailJS / Pixel / "Merci !" are never affected.
+

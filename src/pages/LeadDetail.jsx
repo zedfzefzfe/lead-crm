@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useLeads } from '../lib/leads'
-import { STATUTS, RAISONS, SOURCE_LABELS, FIELD_LABELS } from '../lib/constants'
+import { CLIENT, EXTRA_FIELDS, ITEM, STATUTS, RAISONS, SOURCE_LABELS, FIELD_LABELS } from '../lib/constants'
 import { formatDate, formatDateTime, formatMAD, telLink, whatsappLink } from '../lib/format'
 import StatusBadge from '../components/StatusBadge'
 
@@ -33,7 +33,7 @@ export default function LeadDetail() {
           <p className="text-sm text-muted mt-1">
             {lead.telephone}{lead.ville ? ` · ${lead.ville}` : ''} · {SOURCE_LABELS[lead.source]}
           </p>
-          {lead.atelier && <p className="text-sm mt-1">Atelier : <b className="font-medium">{lead.atelier}</b></p>}
+          {lead[ITEM.key] && <p className="text-sm mt-1">{ITEM.label} : <b className="font-medium">{lead[ITEM.key]}</b></p>}
           {lead.contact_pref && <p className="text-sm mt-1">Préfère : <b className="font-medium">{lead.contact_pref}</b></p>}
         </div>
         <StatusBadge statut={lead.statut} />
@@ -64,7 +64,18 @@ export default function LeadDetail() {
             {RAISONS.map((r) => <option key={r}>{r}</option>)}
           </select>
         </div>
-        <AcompteField key={`a-${lead.montant_acompte}`} value={lead.montant_acompte} onSave={(v) => save({ montant_acompte: v })} />
+        {EXTRA_FIELDS.map((x) => (
+          <div key={x.key}>
+            <label className="label">{x.label}</label>
+            <select className="input" value={lead[x.key] || ''} onChange={(e) => save({ [x.key]: e.target.value || null })}>
+              <option value="">—</option>
+              {x.options.map((o) => <option key={o}>{o}</option>)}
+            </select>
+          </div>
+        ))}
+        {CLIENT.showAcompte && (
+          <AcompteField key={`a-${lead.montant_acompte}`} value={lead.montant_acompte} onSave={(v) => save({ montant_acompte: v })} />
+        )}
         <div>
           <label className="label">Prochaine relance</label>
           <input type="date" className="input" value={lead.prochaine_relance || ''}
@@ -106,7 +117,7 @@ function NotesField({ value, onSave }) {
     <div className="sm:col-span-2">
       <label className="label">Notes</label>
       <textarea rows="4" className="input" value={draft} onChange={(e) => setDraft(e.target.value)}
-        placeholder="Ce qu'elle a dit, ses disponibilités…" />
+        placeholder="Ce qui a été dit, disponibilités…" />
       {dirty && (
         <div className="mt-2 flex gap-2">
           <button className="btn-gold" onClick={() => onSave(draft)}>Enregistrer les notes</button>

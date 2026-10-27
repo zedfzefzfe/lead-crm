@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useLeads } from '../lib/leads'
-import { DEFAULT_ATELIER, SOURCES, SOURCE_LABELS, STATUTS } from '../lib/constants'
+import { EXTRA_FIELDS, ITEM, SOURCES, SOURCE_LABELS, STATUTS } from '../lib/constants'
 
 // Manual entry for leads coming from WhatsApp / Instagram DMs.
 export default function AddLead() {
@@ -11,7 +11,8 @@ export default function AddLead() {
     nom: '',
     telephone: '',
     ville: '',
-    atelier: DEFAULT_ATELIER,
+    [ITEM.key]: ITEM.default,
+    ...Object.fromEntries(EXTRA_FIELDS.map((x) => [x.key, ''])),
     source: 'whatsapp',
     statut: 'Nouveau',
     notes: '',
@@ -19,7 +20,7 @@ export default function AddLead() {
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
 
-  const ateliers = [...new Set([DEFAULT_ATELIER, ...leads.map((l) => l.atelier).filter(Boolean)])]
+  const items = [...new Set([ITEM.default, ...ITEM.options, ...leads.map((l) => l[ITEM.key])].filter(Boolean))]
   const set = (key) => (e) => setForm({ ...form, [key]: e.target.value })
 
   // Warn if this phone number is already in the CRM (avoid duplicates).
@@ -36,7 +37,8 @@ export default function AddLead() {
         nom: form.nom.trim(),
         telephone: form.telephone.trim(),
         ville: form.ville.trim(),
-        atelier: form.atelier.trim(),
+        [ITEM.key]: form[ITEM.key].trim(),
+        ...Object.fromEntries(EXTRA_FIELDS.map((x) => [x.key, form[x.key] || null])),
       })
       navigate(`/leads/${lead.id}`)
     } catch (err) {
@@ -69,10 +71,19 @@ export default function AddLead() {
           <input className="input" value={form.ville} onChange={set('ville')} />
         </div>
         <div className="sm:col-span-2">
-          <label className="label">Atelier</label>
-          <input className="input" list="ateliers" value={form.atelier} onChange={set('atelier')} />
-          <datalist id="ateliers">{ateliers.map((a) => <option key={a} value={a} />)}</datalist>
+          <label className="label">{ITEM.label}</label>
+          <input className="input" list="items" value={form[ITEM.key]} onChange={set(ITEM.key)} />
+          <datalist id="items">{items.map((a) => <option key={a} value={a} />)}</datalist>
         </div>
+        {EXTRA_FIELDS.map((x) => (
+          <div key={x.key} className="sm:col-span-2">
+            <label className="label">{x.label}</label>
+            <select className="input" value={form[x.key]} onChange={set(x.key)}>
+              <option value="">—</option>
+              {x.options.map((o) => <option key={o}>{o}</option>)}
+            </select>
+          </div>
+        ))}
         <div>
           <label className="label">Source</label>
           <select className="input" value={form.source} onChange={set('source')}>
