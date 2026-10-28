@@ -25,7 +25,8 @@ export default {
   item: { key: 'atelier', label: 'Atelier', plural: 'ateliers', default: 'Bougies Casa 31 Oct', options: [] },
   extraFields: [], // more dropdown fields, e.g. payment method
   showAcompte: true,
-  showContactPref: true, // "Contact" column, filled by the landing page pop-up
+  showContactPref: true,
+  quickRelance: true, // follow-up date column in the leads list // "Contact" column, filled by the landing page pop-up
 
   whatsappMessage: (prenom, item) =>
     `Salam ${prenom} 😊\n` +

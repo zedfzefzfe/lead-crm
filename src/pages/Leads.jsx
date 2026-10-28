@@ -3,7 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { useLeads } from '../lib/leads'
 import { CLIENT, EXTRA_FIELDS, ITEM, STATUTS, SOURCES, SOURCE_LABELS } from '../lib/constants'
 import { formatDate, formatMAD, toISODate } from '../lib/format'
-import { NoteEditor, RelanceInput, StatusSelect } from '../components/QuickEdit'
+import { ExtraSelect, NoteEditor, RelanceInput, StatusSelect } from '../components/QuickEdit'
 import LeadCard from '../components/LeadCard'
 
 const FILTERS = ['q', 'statut', 'atelier', 'source', 'du', 'au']
@@ -100,8 +100,9 @@ export default function Leads() {
                 <th className="px-4 py-3 font-medium">Nom</th>
                 <th className="px-4 py-3 font-medium">{ITEM.label}</th>
                 <th className="px-4 py-3 font-medium">Statut</th>
-                <th className="px-4 py-3 font-medium w-[32%]">Note</th>
-                <th className="px-4 py-3 font-medium">Relance</th>
+                <th className="px-4 py-3 font-medium w-[30%]">Note</th>
+                {EXTRA_FIELDS.map((x) => <th key={x.key} className="px-4 py-3 font-medium">{x.label}</th>)}
+                {CLIENT.quickRelance && <th className="px-4 py-3 font-medium">Relance</th>}
                 <th className="px-4 py-3 font-medium">Reçu le</th>
               </tr>
             </thead>
@@ -117,12 +118,12 @@ export default function Leads() {
                   </td>
                   <td className="px-4 py-3">
                     {l[ITEM.key] || '—'}
-                    {EXTRA_FIELDS.map((x) => l[x.key] && <p key={x.key} className="text-xs text-muted">{l[x.key]}</p>)}
                     {l.montant_acompte > 0 && <p className="text-xs text-muted">Acompte {formatMAD(l.montant_acompte)}</p>}
                   </td>
                   <td className="px-4 py-3"><StatusSelect lead={l} /></td>
                   <td className="px-3 py-2"><NoteEditor lead={l} /></td>
-                  <td className="px-3 py-2"><RelanceInput lead={l} /></td>
+                  {EXTRA_FIELDS.map((x) => <td key={x.key} className="px-3 py-2 min-w-[9.5rem]"><ExtraSelect lead={l} field={x} /></td>)}
+                  {CLIENT.quickRelance && <td className="px-3 py-2"><RelanceInput lead={l} /></td>}
                   <td className="px-4 py-3 whitespace-nowrap text-muted">
                     {formatDate(l.created_at)}
                     <p className="text-xs">{SOURCE_LABELS[l.source]}</p>

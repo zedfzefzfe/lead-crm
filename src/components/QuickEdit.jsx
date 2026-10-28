@@ -123,3 +123,23 @@ export function RelanceInput({ lead }) {
     </div>
   )
 }
+
+// Dropdown for an extra field of the client (e.g. Bajaj "Paiement": Au comptant / Crédit à 0 %).
+export function ExtraSelect({ lead, field }) {
+  const save = useSave(lead)
+  return (
+    <select
+      value={lead[field.key] || ''}
+      aria-label={field.label}
+      onChange={(e) => save({ [field.key]: e.target.value || null })}
+      className={`w-full rounded-lg border border-line px-2 py-1 text-xs outline-none focus:border-gold ${
+        lead[field.key] ? 'bg-white text-ink' : 'bg-white text-muted'
+      }`}
+    >
+      <option value="">—</option>
+      {field.options.map((o) => (
+        <option key={o}>{o}</option>
+      ))}
+    </select>
+  )
+}

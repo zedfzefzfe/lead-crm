@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
-import { EXTRA_FIELDS, ITEM, SOURCE_LABELS } from '../lib/constants'
+import { CLIENT, EXTRA_FIELDS, ITEM, SOURCE_LABELS } from '../lib/constants'
 import { formatDate, telLink } from '../lib/format'
-import { NoteEditor, RelanceInput, StatusSelect } from './QuickEdit'
+import { ExtraSelect, NoteEditor, RelanceInput, StatusSelect } from './QuickEdit'
 
 // Lead card used on mobile and on the "À relancer" page.
 // Status, note and follow-up date can be changed right here; the name opens the full lead page.
@@ -20,7 +20,6 @@ export default function LeadCard({ lead, extra }) {
       {lead.ville && <span className="text-sm text-muted"> · {lead.ville}</span>}
       <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted">
         {lead[ITEM.key] && <span>{lead[ITEM.key]}</span>}
-        {EXTRA_FIELDS.map((x) => lead[x.key] && <span key={x.key}>{lead[x.key]}</span>)}
         {lead.contact_pref && <span>Contact : {lead.contact_pref}</span>}
         <span>{SOURCE_LABELS[lead.source]}</span>
         <span>{formatDate(lead.created_at)}</span>
@@ -29,10 +28,18 @@ export default function LeadCard({ lead, extra }) {
       <div className="mt-3">
         <NoteEditor lead={lead} />
       </div>
-      <div className="mt-2 flex items-center gap-2 text-xs text-muted">
-        <span>Relance :</span>
-        <RelanceInput lead={lead} />
-      </div>
+      {EXTRA_FIELDS.map((x) => (
+        <div key={x.key} className="mt-2 flex items-center gap-2 text-xs text-muted">
+          <span className="shrink-0">{x.label} :</span>
+          <ExtraSelect lead={lead} field={x} />
+        </div>
+      ))}
+      {CLIENT.quickRelance && (
+        <div className="mt-2 flex items-center gap-2 text-xs text-muted">
+          <span>Relance :</span>
+          <RelanceInput lead={lead} />
+        </div>
+      )}
     </div>
   )
 }
