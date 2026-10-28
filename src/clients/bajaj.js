@@ -1,6 +1,12 @@
 // Bajaj Maroc — motorcycle test-ride requests from bajajmaroc.com.
 export default {
-  brand: { name: 'Bajaj Maroc', tagline: 'Leads · CRM', title: 'Bajaj Maroc CRM' },
+  brand: {
+    name: 'Bajaj Maroc',
+    tagline: 'Leads · CRM',
+    title: 'Bajaj Maroc CRM',
+    logo: '/clients/bajaj-logo.png', // full logo (sidebar, login, phone header)
+    favicon: '/clients/bajaj-favicon.png', // browser tab icon
+  },
   // Overrides the colour tokens from index.css: cool greys + Bajaj blue.
   theme: {
     '--color-cream': '#f6f7f9',
@@ -8,8 +14,8 @@ export default {
     '--color-line': '#e3e6ec',
     '--color-ink': '#111827',
     '--color-muted': '#6b7280',
-    '--color-gold': '#0b5cad',
-    '--color-gold-dark': '#084a8c',
+    '--color-gold': '#0061b0', // Bajaj logo blue
+    '--color-gold-dark': '#004e8f',
   },
 
   statuts: ['Nouveau', 'Contacté', 'Pas de réponse', 'Intéressé', 'Essai programmé', 'Vendu', 'Perdu'],

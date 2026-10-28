@@ -21,10 +21,14 @@ export default function Login() {
   return (
     <div className="grid min-h-screen place-items-center bg-cream px-5">
       <form onSubmit={submit} className="card w-full max-w-sm p-7">
-        <span className="grid h-10 w-10 place-items-center rounded-lg bg-gold text-[17px] font-bold text-white">
-          {CLIENT.brand.name[0]}
-        </span>
-        <h1 className="mt-5 text-[20px] font-semibold tracking-tight">Connexion</h1>
+        {CLIENT.brand.logo ? (
+          <img src={CLIENT.brand.logo} alt={CLIENT.brand.name} className="h-auto w-full" />
+        ) : (
+          <span className="grid h-10 w-10 place-items-center rounded-lg bg-gold text-[17px] font-bold text-white">
+            {CLIENT.brand.name[0]}
+          </span>
+        )}
+        <h1 className="mt-6 text-[20px] font-semibold tracking-tight">Connexion</h1>
         <p className="mb-6 mt-0.5 text-[13px] text-muted">{CLIENT.brand.name} · {CLIENT.brand.tagline}</p>
 
         <label className="label" htmlFor="email">Email</label>

@@ -29,7 +29,7 @@ export default function Layout({ user, children }) {
     <div className="min-h-screen md:flex">
       {/* Desktop sidebar */}
       <aside className="hidden md:fixed md:inset-y-0 md:flex md:w-60 md:flex-col border-r border-line bg-white">
-        <div className="flex h-14 items-center border-b border-line px-4">
+        <div className="flex min-h-14 items-center border-b border-line px-4 py-4">
           <Brand />
         </div>
         <nav className="flex flex-col gap-0.5 p-3">
@@ -62,8 +62,8 @@ export default function Layout({ user, children }) {
       </aside>
 
       {/* Mobile header */}
-      <header className="sticky top-0 z-20 flex h-14 items-center justify-between border-b border-line bg-white/95 px-4 backdrop-blur md:hidden">
-        <Brand />
+      <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-line bg-white/95 px-4 backdrop-blur md:hidden">
+        <Brand size="sm" />
         <button onClick={logout} className="text-[13px] text-muted">
           Déconnexion
         </button>
@@ -100,10 +100,15 @@ export default function Layout({ user, children }) {
   )
 }
 
-export function Brand() {
+// Client logo if there is one (e.g. Bajaj), otherwise a letter mark + name.
+export function Brand({ size = 'md' }) {
+  if (CLIENT.brand.logo) {
+    const cls = size === 'sm' ? 'h-10 w-auto' : 'h-auto w-full'
+    return <img src={CLIENT.brand.logo} alt={CLIENT.brand.name} className={`${cls} object-contain`} />
+  }
   return (
     <div className="flex items-center gap-2.5">
-      <span className="grid h-7 w-7 place-items-center rounded-md bg-gold text-[13px] font-bold text-white">
+      <span className={`grid place-items-center rounded-md bg-gold font-bold text-white ${size === 'lg' ? 'h-10 w-10 text-[17px]' : 'h-7 w-7 text-[13px]'}`}>
         {CLIENT.brand.name[0]}
       </span>
       <div className="leading-tight">
