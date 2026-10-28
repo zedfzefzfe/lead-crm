@@ -1,4 +1,8 @@
 import { CLIENT, ITEM } from './constants'
+import { currentLang } from './i18n'
+
+// Dates follow the interface language, always with Western digits.
+const loc = () => currentLang().locale
 
 // Small helpers shared by the pages.
 
@@ -16,12 +20,13 @@ export function formatDate(value) {
   if (!value) return '—'
   // Plain dates ("2026-10-17") are shown as-is in local time.
   const d = value.length === 10 ? new Date(value + 'T00:00:00') : new Date(value)
-  return d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })
+  return d.toLocaleDateString(loc(), { day: '2-digit', month: 'short', year: 'numeric', numberingSystem: 'latn' })
 }
 
 export function formatDateTime(value) {
   if (!value) return '—'
-  return new Date(value).toLocaleString('fr-FR', {
+  return new Date(value).toLocaleString(loc(), {
+    numberingSystem: 'latn',
     day: '2-digit',
     month: 'short',
     hour: '2-digit',

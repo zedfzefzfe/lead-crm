@@ -3,6 +3,7 @@ import { A_RELANCER, CLIENT } from '../lib/constants'
 import { formatDate, todayISO } from '../lib/format'
 import LeadCard from '../components/LeadCard'
 import PageHeader from '../components/PageHeader'
+import { t } from '../lib/i18n'
 
 // Leads to call back today:
 // - a follow-up date is set → the lead shows from that day on (unless closed: won or lost);
@@ -28,15 +29,15 @@ export default function Relances() {
   return (
     <div>
       <PageHeader
-        title="À relancer aujourd'hui"
-        subtitle={`${list.length} lead${list.length > 1 ? 's' : ''} à appeler · les plus anciens en premier`}
+        title={t('rel.title')}
+        subtitle={t('rel.subtitle', { x: list.length === 1 ? t('rel.lead') : t('rel.leads', { x: list.length }) })}
       />
 
-      {loading && <p className="text-muted">Chargement…</p>}
+      {loading && <p className="text-muted">{t('loading')}</p>}
       {!loading && list.length === 0 && (
         <div className="card px-6 py-12 text-center">
-          <p className="font-medium">Rien à relancer</p>
-          <p className="mt-1 text-[13px] text-muted">Tous les leads ont été traités pour aujourd'hui.</p>
+          <p className="font-medium">{t('rel.emptyTitle')}</p>
+          <p className="mt-1 text-[13px] text-muted">{t('rel.emptyText')}</p>
         </div>
       )}
 
@@ -48,8 +49,8 @@ export default function Relances() {
             extra={
               l.prochaine_relance && (
                 <span className={`font-medium ${l.prochaine_relance < today ? 'text-red-600' : 'text-gold'}`}>
-                  Relance {l.prochaine_relance === today ? "aujourd'hui" : `prévue le ${formatDate(l.prochaine_relance)}`}
-                  {l.prochaine_relance < today && ' · en retard'}
+                  {l.prochaine_relance === today ? t('rel.today') : t('rel.planned', { x: formatDate(l.prochaine_relance) })}
+                  {l.prochaine_relance < today && t('rel.late')}
                 </span>
               )
             }

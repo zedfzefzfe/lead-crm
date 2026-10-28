@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import { isConfigured, supabase } from './lib/supabase'
 import { LeadsProvider } from './lib/leads'
 import Layout from './components/Layout'
+import { t } from './lib/i18n'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 import Leads from './pages/Leads'
@@ -23,10 +24,7 @@ export default function App() {
   if (!isConfigured) {
     return (
       <div className="min-h-screen grid place-items-center p-6 text-center">
-        <p className="max-w-sm text-muted">
-          Configuration manquante : ajoutez <code>VITE_SUPABASE_URL</code> et{' '}
-          <code>VITE_SUPABASE_ANON_KEY</code> dans les variables d'environnement.
-        </p>
+        <p className="max-w-sm text-muted">{t('configMissing')}</p>
       </div>
     )
   }

@@ -2,7 +2,7 @@
 
 /* Design tokens. Each client can override them in src/clients/<name>.js (theme). */
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-sans: "Inter", "Noto Sans Arabic", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
 
   --color-cream: #f8f7f5;      /* page background */
   --color-sand: #f1efeb;       /* subtle fills: hover, table header, active nav */

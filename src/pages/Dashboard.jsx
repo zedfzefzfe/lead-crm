@@ -3,6 +3,7 @@ import { useLeads } from '../lib/leads'
 import { CLIENT, EXTRA_FIELDS, ITEM, STATUTS, STATUT_STYLES, SOURCE_LABELS } from '../lib/constants'
 import { formatMAD } from '../lib/format'
 import PageHeader from '../components/PageHeader'
+import { t, tv } from '../lib/i18n'
 import { StatusDot } from '../components/StatusBadge'
 
 function startOfToday() {
@@ -35,8 +36,8 @@ function countBy(list, key) {
 export default function Dashboard() {
   const { leads, loading, error } = useLeads()
 
-  if (loading) return <p className="text-muted">Chargement…</p>
-  if (error) return <p className="text-red-600">Erreur : {error}</p>
+  if (loading) return <p className="text-muted">{t('loading')}</p>
+  if (error) return <p className="text-red-600">{t('error', { x: error })}</p>
 
   const since = (date) => leads.filter((l) => new Date(l.created_at) >= date).length
   const won = leads.filter((l) => CLIENT.won.includes(l.statut)).length
@@ -46,16 +47,16 @@ export default function Dashboard() {
   leads.forEach((l) => (perStatut[l.statut] = (perStatut[l.statut] || 0) + 1))
 
   const kpis = [
-    { label: "Aujourd'hui", value: since(startOfToday()) },
-    { label: 'Cette semaine', value: since(startOfWeek()) },
-    { label: 'Ce mois', value: since(startOfMonth()) },
-    { label: 'Taux de conversion', value: `${conversion} %`, hint: CLIENT.won.join(' + ') },
-    ...(CLIENT.showAcompte ? [{ label: 'Acomptes encaissés', value: formatMAD(deposits) }] : []),
+    { label: t('dash.today'), value: since(startOfToday()) },
+    { label: t('dash.week'), value: since(startOfWeek()) },
+    { label: t('dash.month'), value: since(startOfMonth()) },
+    { label: t('dash.conversion'), value: `${conversion} %`, hint: CLIENT.won.map(tv).join(' + ') },
+    ...(CLIENT.showAcompte ? [{ label: t('dash.deposits'), value: formatMAD(deposits) }] : []),
   ]
 
   return (
     <div>
-      <PageHeader title="Tableau de bord" subtitle={`${leads.length} leads au total`} />
+      <PageHeader title={t('nav.dashboard')} subtitle={t('dash.total', { x: leads.length })} />
 
       {/* Key numbers */}
       <section className="card grid grid-cols-2 divide-line md:grid-cols-5 md:divide-x">
@@ -71,17 +72,17 @@ export default function Dashboard() {
       <div className="mt-4 grid gap-4 lg:grid-cols-3">
         {/* Pipeline by status */}
         <section className="card lg:col-span-2">
-          <CardTitle>Pipeline</CardTitle>
+          <CardTitle>{t('dash.pipeline')}</CardTitle>
           <ul className="divide-y divide-line">
             {STATUTS.map((s) => (
               <li key={s}>
                 <Link to={`/leads?statut=${encodeURIComponent(s)}`} className="flex items-center gap-3 px-5 py-2.5 hover:bg-sand/40">
                   <StatusDot statut={s} />
-                  <span className="w-36 shrink-0 text-[13px]">{s}</span>
+                  <span className="w-36 shrink-0 text-[13px]">{tv(s)}</span>
                   <div className="h-1.5 flex-1 rounded-full bg-sand">
                     <div className={`h-1.5 rounded-full ${STATUT_STYLES[s]}`} style={{ width: `${leads.length ? (perStatut[s] / leads.length) * 100 : 0}%` }} />
                   </div>
-                  <span className="w-8 text-right text-[13px] font-medium tabular-nums">{perStatut[s]}</span>
+                  <span className="w-8 text-end text-[13px] font-medium tabular-nums">{perStatut[s]}</span>
                 </Link>
               </li>
             ))}
@@ -89,18 +90,18 @@ export default function Dashboard() {
         </section>
 
         <Breakdown
-          title="Raisons des leads perdus"
+          title={t('dash.lostReasons')}
           rows={countBy(leads.filter((l) => l.statut === CLIENT.lost), 'raison')}
           total={perStatut[CLIENT.lost]}
-          empty="Aucun lead perdu"
+          empty={t('dash.noLost')}
         />
       </div>
 
       <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        <Breakdown title="Par source" rows={countBy(leads, 'source').map(([k, v]) => [SOURCE_LABELS[k] || k, v])} total={leads.length} />
-        <Breakdown title={`Par ${ITEM.label.toLowerCase()}`} rows={countBy(leads, ITEM.key)} total={leads.length} />
+        <Breakdown title={t('dash.by', { x: t('dash.source') })} rows={countBy(leads, 'source').map(([k, v]) => [SOURCE_LABELS[k] || k, v])} total={leads.length} />
+        <Breakdown title={t('dash.by', { x: tv(ITEM.label).toLowerCase() })} rows={countBy(leads, ITEM.key)} total={leads.length} />
         {EXTRA_FIELDS.map((x) => (
-          <Breakdown key={x.key} title={`Par ${x.label.toLowerCase()}`} rows={countBy(leads, x.key)} total={leads.length} />
+          <Breakdown key={x.key} title={t('dash.by', { x: tv(x.label).toLowerCase() })} rows={countBy(leads, x.key)} total={leads.length} />
         ))}
       </div>
     </div>
@@ -111,7 +112,7 @@ function CardTitle({ children }) {
   return <h2 className="border-b border-line px-5 py-3 text-[14px] font-semibold">{children}</h2>
 }
 
-function Breakdown({ title, rows, total, empty = 'Aucune donnée' }) {
+function Breakdown({ title, rows, total, empty = t('dash.noData') }) {
   return (
     <section className="card">
       <CardTitle>{title}</CardTitle>
@@ -121,7 +122,7 @@ function Breakdown({ title, rows, total, empty = 'Aucune donnée' }) {
           {rows.map(([name, n]) => (
             <li key={name}>
               <div className="flex justify-between text-[13px]">
-                <span className="truncate pr-2">{name}</span>
+                <span className="truncate pe-2">{tv(name)}</span>
                 <span className="font-medium tabular-nums">
                   {n} <span className="font-normal text-muted">· {total ? Math.round((n / total) * 100) : 0} %</span>
                 </span>

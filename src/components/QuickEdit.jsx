@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useLeads } from '../lib/leads'
 import { STATUTS } from '../lib/constants'
 import { StatusDot } from './StatusBadge'
+import { t, tv } from '../lib/i18n'
 import { toISODate } from '../lib/format'
 
 // Small controls to edit a lead straight from the list (no need to open the lead page).
@@ -13,7 +14,7 @@ function useSave(lead) {
     try {
       await updateLead(lead.id, changes)
     } catch (e) {
-      notify(`Erreur : ${e.message}`)
+      notify(t('error', { x: e.message }))
     }
   }
 }
@@ -23,20 +24,20 @@ export function StatusSelect({ lead }) {
   const save = useSave(lead)
   return (
     <div className="relative inline-flex w-full max-w-[14rem] items-center">
-      <StatusDot statut={lead.statut} className="pointer-events-none absolute left-2.5" />
+      <StatusDot statut={lead.statut} className="pointer-events-none absolute start-2.5" />
       <select
         value={lead.statut}
         onChange={(e) => save({ statut: e.target.value })}
-        aria-label="Statut"
-        className="h-8 w-full cursor-pointer appearance-none rounded-md border border-line bg-white pl-6 pr-7 text-[13px] font-medium text-ink outline-none hover:bg-sand/50 focus:border-gold focus:ring-3 focus:ring-gold/15"
+        aria-label={t('leads.status')}
+        className="h-8 w-full cursor-pointer appearance-none rounded-md border border-line bg-white ps-6 pe-7 text-[13px] font-medium text-ink outline-none hover:bg-sand/50 focus:border-gold focus:ring-3 focus:ring-gold/15"
       >
         {STATUTS.map((s) => (
           <option key={s} value={s}>
-            {s}
+            {tv(s)}
           </option>
         ))}
       </select>
-      <svg viewBox="0 0 10 6" className="pointer-events-none absolute right-2.5 h-1.5 w-2.5 text-muted" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <svg viewBox="0 0 10 6" className="pointer-events-none absolute end-2.5 h-1.5 w-2.5 text-muted" fill="none" stroke="currentColor" strokeWidth="1.5">
         <path d="M1 1l4 4 4-4" />
       </svg>
     </div>
@@ -65,10 +66,10 @@ export function NoteEditor({ lead }) {
       <button
         type="button"
         onClick={() => setEditing(true)}
-        title={value || 'Ajouter une note'}
-        className="block min-h-8 w-full rounded-md border border-transparent px-2.5 py-1.5 text-left text-[13px] leading-snug hover:border-line hover:bg-white"
+        title={value || t('note.add')}
+        className="block min-h-8 w-full rounded-md border border-transparent px-2.5 py-1.5 text-start text-[13px] leading-snug hover:border-line hover:bg-white"
       >
-        {value ? <span className="line-clamp-2 whitespace-pre-line text-ink">{value}</span> : <span className="text-muted/70">Ajouter une note…</span>}
+        {value ? <span className="line-clamp-2 whitespace-pre-line text-ink">{value}</span> : <span className="text-muted/70">{t('note.add')}</span>}
       </button>
     )
   }
@@ -78,7 +79,7 @@ export function NoteEditor({ lead }) {
       autoFocus
       rows={3}
       value={draft}
-      placeholder="Résultat de l'appel…"
+      placeholder={t('note.placeholder')}
       onFocus={(e) => e.currentTarget.setSelectionRange(draft.length, draft.length)}
       onChange={(e) => setDraft(e.target.value)}
       onBlur={commit}
@@ -109,7 +110,7 @@ export function RelanceInput({ lead }) {
       <input
         type="date"
         value={value}
-        aria-label="Prochaine relance"
+        aria-label={t('lead.nextFollowUp')}
         onChange={(e) => save({ prochaine_relance: e.target.value || null })}
         className={`h-8 w-[8.75rem] rounded-md border px-2 text-[13px] outline-none focus:border-gold ${
           late ? 'border-red-200 bg-red-50 text-red-700' : value ? 'border-line bg-white' : 'border-line bg-white text-muted'
@@ -118,7 +119,7 @@ export function RelanceInput({ lead }) {
       {value ? (
         <button
           type="button"
-          title="Retirer la relance"
+          title={t('relance.remove')}
           onClick={() => save({ prochaine_relance: null })}
           className="rounded-md px-1.5 text-muted hover:text-red-600"
         >
@@ -127,11 +128,11 @@ export function RelanceInput({ lead }) {
       ) : (
         <button
           type="button"
-          title="Relancer demain"
+          title={t('relance.tomorrowTitle')}
           onClick={() => save({ prochaine_relance: tomorrow })}
           className="h-8 whitespace-nowrap rounded-md px-2 text-[13px] font-medium text-gold hover:bg-sand"
         >
-          Demain
+          {t('relance.tomorrow')}
         </button>
       )}
     </div>

@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react'
 import { supabase } from './supabase'
+import { t } from './i18n'
 
 // Holds every lead in memory and keeps the list in sync with Supabase Realtime,
 // so all pages update instantly for everyone who is logged in.
@@ -54,7 +55,7 @@ export function LeadsProvider({ children }) {
           setLeads((list) =>
             list.some((l) => l.id === payload.new.id) ? list : [payload.new, ...list]
           )
-          notify(`Nouveau lead : ${payload.new.nom}`)
+          notify(t('newLead', { x: payload.new.nom }))
         } else if (payload.eventType === 'UPDATE') {
           setLeads((list) => list.map((l) => (l.id === payload.new.id ? payload.new : l)))
         } else if (payload.eventType === 'DELETE') {

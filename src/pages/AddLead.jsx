@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import PageHeader from '../components/PageHeader'
+import { t, tv } from '../lib/i18n'
 import { useLeads } from '../lib/leads'
 import { EXTRA_FIELDS, ITEM, SOURCES, SOURCE_LABELS, STATUTS } from '../lib/constants'
 
@@ -50,60 +51,60 @@ export default function AddLead() {
 
   return (
     <div className="max-w-2xl">
-      <PageHeader title="Ajouter un lead" subtitle="Pour les demandes reçues sur WhatsApp, Instagram ou par téléphone." />
+      <PageHeader title={t('nav.add')} subtitle={t('add.subtitle')} />
 
       <form onSubmit={submit} className="card grid gap-4 p-5 sm:grid-cols-2 sm:p-6">
         <div className="sm:col-span-2">
-          <label className="label">Nom *</label>
+          <label className="label">{t('add.name')}</label>
           <input required className="input" value={form.nom} onChange={set('nom')} />
         </div>
         <div>
-          <label className="label">Téléphone *</label>
+          <label className="label">{t('add.phone')}</label>
           <input required type="tel" inputMode="tel" className="input" value={form.telephone} onChange={set('telephone')} placeholder="06…" />
           {duplicate && (
             <p className="mt-1 text-xs text-orange-700">
-              Ce numéro existe déjà : {duplicate.nom} ({duplicate.statut})
+              {t('add.duplicate', { x: duplicate.nom, y: tv(duplicate.statut) })}
             </p>
           )}
         </div>
         <div>
-          <label className="label">Ville</label>
+          <label className="label">{t('add.city')}</label>
           <input className="input" value={form.ville} onChange={set('ville')} />
         </div>
         <div className="sm:col-span-2">
-          <label className="label">{ITEM.label}</label>
+          <label className="label">{tv(ITEM.label)}</label>
           <input className="input" list="items" value={form[ITEM.key]} onChange={set(ITEM.key)} />
           <datalist id="items">{items.map((a) => <option key={a} value={a} />)}</datalist>
         </div>
         {EXTRA_FIELDS.map((x) => (
           <div key={x.key} className="sm:col-span-2">
-            <label className="label">{x.label}</label>
+            <label className="label">{tv(x.label)}</label>
             <select className="input" value={form[x.key]} onChange={set(x.key)}>
               <option value="">—</option>
-              {x.options.map((o) => <option key={o}>{o}</option>)}
+              {x.options.map((o) => <option key={o} value={o}>{tv(o)}</option>)}
             </select>
           </div>
         ))}
         <div>
-          <label className="label">Source</label>
+          <label className="label">{t('add.source')}</label>
           <select className="input" value={form.source} onChange={set('source')}>
-            {SOURCES.map((s) => <option key={s} value={s}>{SOURCE_LABELS[s]}</option>)}
+            {SOURCES.map((s) => <option key={s} value={s}>{tv(SOURCE_LABELS[s])}</option>)}
           </select>
         </div>
         <div>
-          <label className="label">Statut</label>
+          <label className="label">{t('add.status')}</label>
           <select className="input" value={form.statut} onChange={set('statut')}>
-            {STATUTS.map((s) => <option key={s}>{s}</option>)}
+            {STATUTS.map((s) => <option key={s} value={s}>{tv(s)}</option>)}
           </select>
         </div>
         <div className="sm:col-span-2">
-          <label className="label">Notes</label>
+          <label className="label">{t('add.notes')}</label>
           <textarea rows="3" className="input h-auto py-2" value={form.notes} onChange={set('notes')} />
         </div>
         {error && <p className="sm:col-span-2 text-[13px] text-red-600">{error}</p>}
         <div className="flex justify-end gap-2 border-t border-line pt-4 sm:col-span-2">
-          <button type="button" className="btn-ghost" onClick={() => navigate(-1)}>Annuler</button>
-          <button className="btn-gold" disabled={busy}>{busy ? 'Enregistrement…' : 'Enregistrer le lead'}</button>
+          <button type="button" className="btn-ghost" onClick={() => navigate(-1)}>{t('cancel')}</button>
+          <button className="btn-gold" disabled={busy}>{busy ? t('add.busy') : t('add.submit')}</button>
         </div>
       </form>
     </div>

@@ -1,6 +1,6 @@
 export default function Toasts({ toasts }) {
   return (
-    <div className="pointer-events-none fixed inset-x-3 top-3 z-30 flex flex-col items-center gap-2 md:inset-x-auto md:right-6 md:top-auto md:bottom-6 md:items-end">
+    <div className="pointer-events-none fixed inset-x-3 top-3 z-30 flex flex-col items-center gap-2 md:inset-x-auto md:end-6 md:top-auto md:bottom-6 md:items-end">
       {toasts.map((t) => (
         <div
           key={t.id}

@@ -5,39 +5,42 @@ import { useLeads } from '../lib/leads'
 import { CLIENT, EXTRA_FIELDS, ITEM, STATUTS, RAISONS, SOURCE_LABELS, FIELD_LABELS } from '../lib/constants'
 import { formatDate, formatDateTime, formatMAD, telLink, whatsappLink } from '../lib/format'
 import StatusBadge from '../components/StatusBadge'
+import { t, tv } from '../lib/i18n'
+
+const HIST_LABELS = { statut: 'hist.status', raison: 'hist.reason', montant_acompte: 'hist.deposit', notes: 'hist.notes' }
 
 export default function LeadDetail() {
   const { id } = useParams()
   const { leads, loading, updateLead, notify } = useLeads()
   const lead = leads.find((l) => l.id === id)
 
-  if (loading) return <p className="text-muted">Chargement…</p>
-  if (!lead) return <p className="text-muted">Lead introuvable. <Link className="text-gold-dark" to="/leads">Retour</Link></p>
+  if (loading) return <p className="text-muted">{t('loading')}</p>
+  if (!lead) return <p className="text-muted">{t('lead.notFound')} <Link className="text-gold-dark" to="/leads">{t('lead.back')}</Link></p>
 
   // Every change is saved immediately; Realtime pushes it to the rest of the team.
   const save = async (changes) => {
     try {
       await updateLead(lead.id, changes)
     } catch (e) {
-      notify(`Erreur : ${e.message}`)
+      notify(t('error', { x: e.message }))
     }
   }
 
   const infos = [
-    ['Téléphone', lead.telephone],
-    ['Ville', lead.ville],
-    [ITEM.label, lead[ITEM.key]],
-    ...EXTRA_FIELDS.map((x) => [x.label, lead[x.key]]),
-    ['Préférence de contact', lead.contact_pref],
-    ['Source', SOURCE_LABELS[lead.source]],
-    ['Reçu le', formatDateTime(lead.created_at)],
-    ['Modifié', `${formatDateTime(lead.updated_at)}${lead.updated_by ? ` · ${lead.updated_by}` : ''}`],
+    [t('info.phone'), lead.telephone],
+    [t('info.city'), lead.ville],
+    [tv(ITEM.label), lead[ITEM.key]],
+    ...EXTRA_FIELDS.map((x) => [tv(x.label), tv(lead[x.key])]),
+    [t('info.contactPref'), tv(lead.contact_pref)],
+    [t('info.source'), tv(SOURCE_LABELS[lead.source])],
+    [t('info.received'), formatDateTime(lead.created_at)],
+    [t('info.updated'), `${formatDateTime(lead.updated_at)}${lead.updated_by ? ` · ${lead.updated_by}` : ''}`],
   ].filter(([, v]) => v)
 
   return (
     <div>
       <Link to="/leads" className="inline-flex items-center gap-1 text-[13px] text-muted hover:text-ink">
-        <span aria-hidden>←</span> Leads
+        <span aria-hidden className="rtl:-scale-x-100">←</span> {t('lead.back')}
       </Link>
 
       <div className="mt-2 mb-6 flex flex-wrap items-center justify-between gap-3">
@@ -56,7 +59,7 @@ export default function LeadDetail() {
         <div className="flex w-full gap-2 sm:w-auto">
           <a href={telLink(lead.telephone)} className="btn-ghost flex-1 sm:flex-none">
             <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2Z" /></svg>
-            Appeler
+            {t('lead.call')}
           </a>
           <a href={whatsappLink(lead)} target="_blank" rel="noopener noreferrer" className="btn flex-1 bg-[#1faa59] text-white hover:bg-[#178f4a] sm:flex-none">
             <svg viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Z" /></svg>
@@ -68,26 +71,26 @@ export default function LeadDetail() {
       <div className="grid items-start gap-4 lg:grid-cols-3">
         <div className="space-y-4 lg:col-span-2">
           <section className="card">
-            <h2 className="border-b border-line px-5 py-3 text-[14px] font-semibold">Suivi</h2>
+            <h2 className="border-b border-line px-5 py-3 text-[14px] font-semibold">{t('lead.followUp')}</h2>
             <div className="grid gap-4 p-5 sm:grid-cols-2">
               <div>
-                <label className="label">Statut</label>
+                <label className="label">{t('lead.status')}</label>
                 <select className="input" value={lead.statut} onChange={(e) => save({ statut: e.target.value })}>
-                  {STATUTS.map((s) => <option key={s}>{s}</option>)}
+                  {STATUTS.map((s) => <option key={s} value={s}>{tv(s)}</option>)}
                 </select>
               </div>
               <div>
-                <label className="label">Raison</label>
+                <label className="label">{t('lead.reason')}</label>
                 <select className="input" value={lead.raison || ''} onChange={(e) => save({ raison: e.target.value || null })}>
                   <option value="">—</option>
-                  {RAISONS.map((r) => <option key={r}>{r}</option>)}
+                  {RAISONS.map((r) => <option key={r} value={r}>{tv(r)}</option>)}
                 </select>
               </div>
               {CLIENT.showAcompte && (
                 <AcompteField key={`a-${lead.montant_acompte}`} value={lead.montant_acompte} onSave={(v) => save({ montant_acompte: v })} />
               )}
               <div>
-                <label className="label">Prochaine relance</label>
+                <label className="label">{t('lead.nextFollowUp')}</label>
                 <input type="date" className="input" value={lead.prochaine_relance || ''}
                   onChange={(e) => save({ prochaine_relance: e.target.value || null })} />
               </div>
@@ -99,12 +102,12 @@ export default function LeadDetail() {
         </div>
 
         <section className="card">
-          <h2 className="border-b border-line px-5 py-3 text-[14px] font-semibold">Informations</h2>
+          <h2 className="border-b border-line px-5 py-3 text-[14px] font-semibold">{t('lead.info')}</h2>
           <dl className="divide-y divide-line">
             {infos.map(([k, v]) => (
               <div key={k} className="flex justify-between gap-4 px-5 py-2.5 text-[13px]">
                 <dt className="shrink-0 text-muted">{k}</dt>
-                <dd className="text-right font-medium text-ink">{v}</dd>
+                <dd className="text-end font-medium text-ink">{v}</dd>
               </div>
             ))}
           </dl>
@@ -123,7 +126,7 @@ function AcompteField({ value, onSave }) {
   }
   return (
     <div>
-      <label className="label">Montant acompte (DH)</label>
+      <label className="label">{t('lead.deposit')}</label>
       <input type="number" inputMode="decimal" min="0" step="any" className="input" value={draft}
         onChange={(e) => setDraft(e.target.value)} onBlur={commit}
         onKeyDown={(e) => e.key === 'Enter' && e.currentTarget.blur()} />
@@ -136,13 +139,13 @@ function NotesField({ value, onSave }) {
   const dirty = draft !== (value || '')
   return (
     <div className="sm:col-span-2">
-      <label className="label">Notes</label>
+      <label className="label">{t('lead.notes')}</label>
       <textarea rows="4" className="input h-auto py-2" value={draft} onChange={(e) => setDraft(e.target.value)}
-        placeholder="Ce qui a été dit, disponibilités…" />
+        placeholder={t('lead.notesPlaceholder')} />
       {dirty && (
         <div className="mt-2 flex gap-2">
-          <button className="btn-gold" onClick={() => onSave(draft)}>Enregistrer</button>
-          <button className="btn-ghost" onClick={() => setDraft(value || '')}>Annuler</button>
+          <button className="btn-gold" onClick={() => onSave(draft)}>{t('save')}</button>
+          <button className="btn-ghost" onClick={() => setDraft(value || '')}>{t('cancel')}</button>
         </div>
       )}
     </div>
@@ -176,29 +179,29 @@ function History({ leadId, createdAt }) {
 
   const show = (field, v) => {
     if (v === null || v === undefined || v === '') return '—'
-    return field === 'montant_acompte' ? formatMAD(v) : v
+    return field === 'montant_acompte' ? formatMAD(v) : tv(v)
   }
 
   return (
     <section className="card">
-      <h2 className="border-b border-line px-5 py-3 text-[14px] font-semibold">Historique</h2>
+      <h2 className="border-b border-line px-5 py-3 text-[14px] font-semibold">{t('lead.history')}</h2>
       <ol className="px-5 py-4">
         {rows.map((h) => (
-          <li key={h.id} className="relative border-l border-line pb-4 pl-4 text-[13px]">
-            <span className="absolute -left-[4.5px] top-1.5 h-2 w-2 rounded-full border-2 border-white bg-gold" />
+          <li key={h.id} className="relative border-s border-line pb-4 ps-4 text-[13px]">
+            <span className="absolute -start-[4.5px] top-1.5 h-2 w-2 rounded-full border-2 border-white bg-gold" />
             <p>
-              <span className="font-medium">{FIELD_LABELS[h.field] || h.field}</span>
-              {h.field === 'notes' ? ' modifiées' : <> : <span className="text-muted line-through decoration-muted/40">{show(h.field, h.old_value)}</span> → {show(h.field, h.new_value)}</>}
+              <span className="font-medium">{HIST_LABELS[h.field] ? t(HIST_LABELS[h.field]) : FIELD_LABELS[h.field] || h.field}</span>
+              {h.field === 'notes' ? t('hist.notesChanged') : <> : <span className="text-muted line-through decoration-muted/40">{show(h.field, h.old_value)}</span> → {show(h.field, h.new_value)}</>}
             </p>
             {h.field === 'notes' && h.new_value && (
               <p className="mt-1 line-clamp-3 whitespace-pre-line text-muted">{h.new_value}</p>
             )}
-            <p className="mt-0.5 text-[12px] text-muted">{h.changed_by || 'système'} · {formatDateTime(h.changed_at)}</p>
+            <p className="mt-0.5 text-[12px] text-muted">{h.changed_by || t('hist.system')} · {formatDateTime(h.changed_at)}</p>
           </li>
         ))}
-        <li className="relative border-l border-transparent pl-4 text-[13px] text-muted">
-          <span className="absolute -left-[4.5px] top-1.5 h-2 w-2 rounded-full bg-line" />
-          Lead créé le {formatDate(createdAt)}
+        <li className="relative border-s border-transparent ps-4 text-[13px] text-muted">
+          <span className="absolute -start-[4.5px] top-1.5 h-2 w-2 rounded-full bg-line" />
+          {t('hist.created', { x: formatDate(createdAt) })}
         </li>
       </ol>
     </section>
