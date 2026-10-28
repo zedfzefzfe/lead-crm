@@ -150,3 +150,7 @@ begin
   end if;
 end;
 $$;
+
+-- ---------- 5. Employment status (credit buyers, optional) ---------------
+
+alter table public.leads add column if not exists situation_pro text;

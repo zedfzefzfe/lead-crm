@@ -44,7 +44,14 @@ export default {
     default: '',
     options: ['Pulsar N125', 'Pulsar N250', 'Pulsar RS200', 'Pulsar NS 400Z'],
   },
-  extraFields: [{ key: 'paiement', label: 'Paiement', options: ['Au comptant', 'Crédit à 0 %'] }],
+  extraFields: [
+    { key: 'paiement', label: 'Paiement', options: ['Au comptant', 'Crédit à 0 %'] },
+    {
+      key: 'situation_pro', // filled by the website form, only for credit buyers (optional)
+      label: 'Situation pro.',
+      options: ['Salarié CDI (plus d’1 an)', 'Salarié CDD', 'Auto-entrepreneur', 'Chef d’entreprise / Société', 'Retraité', 'Secteur informel', 'Autre'],
+    },
+  ],
   showAcompte: true,
   showContactPref: false,
   quickRelance: false, // the list shows Paiement instead (date stays on the lead page)

@@ -102,7 +102,8 @@ export default function Leads() {
                 <th className="px-4 py-2.5 font-medium">{tv(ITEM.label)}</th>
                 <th className="px-3 py-2.5 font-medium">{t('leads.status')}</th>
                 <th className="w-[30%] min-w-[14rem] px-4 py-2.5 font-medium">{t('col.note')}</th>
-                {EXTRA_FIELDS.map((x) => <th key={x.key} className="px-4 py-2.5 font-medium">{tv(x.label)}</th>)}
+                {/* Extra client fields share one column: the first one, the others as a small line below */}
+                {EXTRA_FIELDS.length > 0 && <th className="px-4 py-2.5 font-medium">{tv(EXTRA_FIELDS[0].label)}</th>}
                 {CLIENT.quickRelance && <th className="px-4 py-2.5 font-medium">{t('col.relance')}</th>}
                 <th className="px-4 py-2.5 font-medium text-end!">{t('col.received')}</th>
               </tr>
@@ -123,7 +124,12 @@ export default function Leads() {
                   </td>
                   <td className="min-w-[12.5rem] px-3 py-2"><StatusSelect lead={l} /></td>
                   <td className="px-2 py-1.5"><NoteEditor lead={l} /></td>
-                  {EXTRA_FIELDS.map((x) => <td key={x.key} className="whitespace-nowrap px-4 py-3 text-ink">{tv(l[x.key]) || <span className="text-muted">—</span>}</td>)}
+                  {EXTRA_FIELDS.length > 0 && (
+                    <td className="whitespace-nowrap px-4 py-3 text-ink">
+                      {tv(l[EXTRA_FIELDS[0].key]) || <span className="text-muted">—</span>}
+                      {EXTRA_FIELDS.slice(1).map((x) => l[x.key] && <p key={x.key} className="mt-0.5 text-[12px] text-muted" title={tv(x.label)}>{tv(l[x.key])}</p>)}
+                    </td>
+                  )}
                   {CLIENT.quickRelance && <td className="px-3 py-2"><RelanceInput lead={l} /></td>}
                   <td className="whitespace-nowrap px-4 py-3 text-end text-muted">
                     <span className="tabular-nums">{formatDate(l.created_at)}</span>

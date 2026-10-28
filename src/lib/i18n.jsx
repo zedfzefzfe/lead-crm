@@ -196,6 +196,14 @@ const VALUES = {
   modèles: { en: 'models', ar: 'الموديلات' },
   Paiement: { en: 'Payment', ar: 'طريقة الدفع' },
   'Non renseigné': { en: 'Not specified', ar: 'غير محدد' },
+  // Employment status (Bajaj credit buyers)
+  'Situation pro.': { en: 'Employment', ar: 'الوضعية المهنية' },
+  'Salarié CDI (plus d’1 an)': { en: 'Permanent employee (1+ year)', ar: 'أجير بعقد دائم (أكثر من سنة)' },
+  'Salarié CDD': { en: 'Fixed-term employee', ar: 'أجير بعقد محدد المدة' },
+  'Auto-entrepreneur': { en: 'Self-employed', ar: 'مقاول ذاتي' },
+  'Chef d’entreprise / Société': { en: 'Business owner / Company', ar: 'صاحب مقاولة / شركة' },
+  'Retraité': { en: 'Retired', ar: 'متقاعد' },
+  'Secteur informel': { en: 'Informal sector', ar: 'القطاع غير المهيكل' },
 }
 
 const STORAGE_KEY = 'crm-lang'

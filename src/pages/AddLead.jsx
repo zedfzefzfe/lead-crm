@@ -40,7 +40,8 @@ export default function AddLead() {
         telephone: form.telephone.trim(),
         ville: form.ville.trim(),
         [ITEM.key]: form[ITEM.key].trim(),
-        ...Object.fromEntries(EXTRA_FIELDS.map((x) => [x.key, form[x.key] || null])),
+        // only filled extra fields are sent (works even before a new column exists in the database)
+        ...Object.fromEntries(EXTRA_FIELDS.filter((x) => form[x.key]).map((x) => [x.key, form[x.key]])),
       })
       navigate(`/leads/${lead.id}`)
     } catch (err) {
