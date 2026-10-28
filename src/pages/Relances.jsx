@@ -3,18 +3,19 @@ import { A_RELANCER, CLIENT } from '../lib/constants'
 import { formatDate, todayISO } from '../lib/format'
 import LeadCard from '../components/LeadCard'
 
-// Leads to call back: still open (A_RELANCER statuses, e.g. Nouveau / Pas de réponse),
-// or with a follow-up date that is today or overdue (unless the lead is closed: won or lost).
+// Leads to call back today:
+// - a follow-up date is set → the lead shows from that day on (unless closed: won or lost);
+// - no follow-up date → the lead shows while its status still needs a call (A_RELANCER, e.g. Nouveau).
 // Oldest first, so nobody is forgotten.
 export function useRelances() {
   const { leads } = useLeads()
   const today = todayISO()
   return leads
-    .filter(
-      (l) =>
-        A_RELANCER.includes(l.statut) ||
-        (l.prochaine_relance && l.prochaine_relance <= today && !CLIENT.closed.includes(l.statut))
-    )
+    .filter((l) => {
+      if (CLIENT.closed.includes(l.statut)) return false
+      if (l.prochaine_relance) return l.prochaine_relance <= today
+      return A_RELANCER.includes(l.statut)
+    })
     .sort((a, b) => a.created_at.localeCompare(b.created_at))
 }
 

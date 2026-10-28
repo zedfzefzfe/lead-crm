@@ -1,16 +1,15 @@
 import { useMemo } from 'react'
-import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { useLeads } from '../lib/leads'
 import { CLIENT, EXTRA_FIELDS, ITEM, STATUTS, SOURCES, SOURCE_LABELS } from '../lib/constants'
 import { formatDate, formatMAD, toISODate } from '../lib/format'
-import StatusBadge from '../components/StatusBadge'
+import { NoteEditor, RelanceInput, StatusSelect } from '../components/QuickEdit'
 import LeadCard from '../components/LeadCard'
 
 const FILTERS = ['q', 'statut', 'atelier', 'source', 'du', 'au']
 
 export default function Leads() {
   const { leads, loading, error } = useLeads()
-  const navigate = useNavigate()
   // Filters live in the URL so they survive a refresh and can be shared.
   const [params, setParams] = useSearchParams()
   const f = Object.fromEntries(FILTERS.map((k) => [k, params.get(k) || '']))
@@ -99,31 +98,35 @@ export default function Leads() {
             <thead className="bg-sand/60 text-left text-xs uppercase tracking-wider text-muted">
               <tr>
                 <th className="px-4 py-3 font-medium">Nom</th>
-                <th className="px-4 py-3 font-medium">Téléphone</th>
-                <th className="px-4 py-3 font-medium">Ville</th>
                 <th className="px-4 py-3 font-medium">{ITEM.label}</th>
-                {EXTRA_FIELDS.map((x) => <th key={x.key} className="px-4 py-3 font-medium">{x.label}</th>)}
-                {CLIENT.showContactPref && <th className="px-4 py-3 font-medium">Contact</th>}
-                <th className="px-4 py-3 font-medium">Source</th>
                 <th className="px-4 py-3 font-medium">Statut</th>
-                <th className="px-4 py-3 font-medium text-right">Acompte</th>
+                <th className="px-4 py-3 font-medium w-[32%]">Note</th>
+                <th className="px-4 py-3 font-medium">Relance</th>
                 <th className="px-4 py-3 font-medium">Reçu le</th>
               </tr>
             </thead>
             <tbody>
               {filtered.map((l) => (
-                <tr key={l.id} onClick={() => navigate(`/leads/${l.id}`)}
-                  className="border-t border-line cursor-pointer hover:bg-sand/40">
-                  <td className="px-4 py-3 font-medium">{l.nom}</td>
-                  <td className="px-4 py-3 whitespace-nowrap">{l.telephone}</td>
-                  <td className="px-4 py-3">{l.ville}</td>
-                  <td className="px-4 py-3">{l[ITEM.key]}</td>
-                  {EXTRA_FIELDS.map((x) => <td key={x.key} className="px-4 py-3">{l[x.key] || '—'}</td>)}
-                  {CLIENT.showContactPref && <td className="px-4 py-3">{l.contact_pref || '—'}</td>}
-                  <td className="px-4 py-3">{SOURCE_LABELS[l.source]}</td>
-                  <td className="px-4 py-3"><StatusBadge statut={l.statut} /></td>
-                  <td className="px-4 py-3 text-right whitespace-nowrap">{l.montant_acompte > 0 ? formatMAD(l.montant_acompte) : '—'}</td>
-                  <td className="px-4 py-3 whitespace-nowrap text-muted">{formatDate(l.created_at)}</td>
+                <tr key={l.id} className="border-t border-line align-top hover:bg-sand/30">
+                  <td className="px-4 py-3">
+                    <Link to={`/leads/${l.id}`} className="font-medium hover:text-gold-dark">
+                      {l.nom} <span className="text-muted">›</span>
+                    </Link>
+                    <p className="whitespace-nowrap text-muted">{l.telephone}{l.ville ? ` · ${l.ville}` : ''}</p>
+                    {CLIENT.showContactPref && l.contact_pref && <p className="text-xs text-muted">Contact : {l.contact_pref}</p>}
+                  </td>
+                  <td className="px-4 py-3">
+                    {l[ITEM.key] || '—'}
+                    {EXTRA_FIELDS.map((x) => l[x.key] && <p key={x.key} className="text-xs text-muted">{l[x.key]}</p>)}
+                    {l.montant_acompte > 0 && <p className="text-xs text-muted">Acompte {formatMAD(l.montant_acompte)}</p>}
+                  </td>
+                  <td className="px-4 py-3"><StatusSelect lead={l} /></td>
+                  <td className="px-3 py-2"><NoteEditor lead={l} /></td>
+                  <td className="px-3 py-2"><RelanceInput lead={l} /></td>
+                  <td className="px-4 py-3 whitespace-nowrap text-muted">
+                    {formatDate(l.created_at)}
+                    <p className="text-xs">{SOURCE_LABELS[l.source]}</p>
+                  </td>
                 </tr>
               ))}
             </tbody>

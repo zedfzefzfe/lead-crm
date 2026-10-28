@@ -1,20 +1,24 @@
 import { Link } from 'react-router-dom'
-import StatusBadge from './StatusBadge'
 import { EXTRA_FIELDS, ITEM, SOURCE_LABELS } from '../lib/constants'
-import { formatDate } from '../lib/format'
+import { formatDate, telLink } from '../lib/format'
+import { NoteEditor, RelanceInput, StatusSelect } from './QuickEdit'
 
-// Compact lead card used on mobile and on the "À relancer" page.
+// Lead card used on mobile and on the "À relancer" page.
+// Status, note and follow-up date can be changed right here; the name opens the full lead page.
 export default function LeadCard({ lead, extra }) {
   return (
-    <Link to={`/leads/${lead.id}`} className="card block p-4 active:bg-sand">
+    <div className="card p-4">
       <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <p className="font-medium truncate">{lead.nom}</p>
-          <p className="text-sm text-muted">{lead.telephone}{lead.ville ? ` · ${lead.ville}` : ''}</p>
-        </div>
-        <StatusBadge statut={lead.statut} />
+        <Link to={`/leads/${lead.id}`} className="min-w-0 group">
+          <p className="font-medium truncate group-hover:text-gold-dark">{lead.nom} <span className="text-muted">›</span></p>
+        </Link>
+        <StatusSelect lead={lead} />
       </div>
-      <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted">
+      <a href={telLink(lead.telephone)} className="text-sm text-gold-dark">
+        {lead.telephone}
+      </a>
+      {lead.ville && <span className="text-sm text-muted"> · {lead.ville}</span>}
+      <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted">
         {lead[ITEM.key] && <span>{lead[ITEM.key]}</span>}
         {EXTRA_FIELDS.map((x) => lead[x.key] && <span key={x.key}>{lead[x.key]}</span>)}
         {lead.contact_pref && <span>Contact : {lead.contact_pref}</span>}
@@ -22,6 +26,13 @@ export default function LeadCard({ lead, extra }) {
         <span>{formatDate(lead.created_at)}</span>
         {extra}
       </div>
-    </Link>
+      <div className="mt-3">
+        <NoteEditor lead={lead} />
+      </div>
+      <div className="mt-2 flex items-center gap-2 text-xs text-muted">
+        <span>Relance :</span>
+        <RelanceInput lead={lead} />
+      </div>
+    </div>
   )
 }
