@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { CLIENT, EXTRA_FIELDS, ITEM, SOURCE_LABELS } from '../lib/constants'
 import { formatDate, telLink } from '../lib/format'
-import { ExtraSelect, NoteEditor, RelanceInput, StatusSelect } from './QuickEdit'
+import { NoteEditor, RelanceInput, StatusSelect } from './QuickEdit'
 
 // Lead card used on mobile and on the "À relancer" page.
 // Status, note and follow-up date can be changed right here; the name opens the full lead page.
@@ -29,10 +29,9 @@ export default function LeadCard({ lead, extra }) {
         <NoteEditor lead={lead} />
       </div>
       {EXTRA_FIELDS.map((x) => (
-        <div key={x.key} className="mt-2 flex items-center gap-2 text-xs text-muted">
-          <span className="shrink-0">{x.label} :</span>
-          <ExtraSelect lead={lead} field={x} />
-        </div>
+        <p key={x.key} className="mt-2 text-xs text-muted">
+          {x.label} : <b className="font-medium text-ink">{lead[x.key] || '—'}</b>
+        </p>
       ))}
       {CLIENT.quickRelance && (
         <div className="mt-2 flex items-center gap-2 text-xs text-muted">

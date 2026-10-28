@@ -3,7 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { useLeads } from '../lib/leads'
 import { CLIENT, EXTRA_FIELDS, ITEM, STATUTS, SOURCES, SOURCE_LABELS } from '../lib/constants'
 import { formatDate, formatMAD, toISODate } from '../lib/format'
-import { ExtraSelect, NoteEditor, RelanceInput, StatusSelect } from '../components/QuickEdit'
+import { NoteEditor, RelanceInput, StatusSelect } from '../components/QuickEdit'
 import LeadCard from '../components/LeadCard'
 
 const FILTERS = ['q', 'statut', 'atelier', 'source', 'du', 'au']
@@ -122,7 +122,7 @@ export default function Leads() {
                   </td>
                   <td className="px-4 py-3"><StatusSelect lead={l} /></td>
                   <td className="px-3 py-2"><NoteEditor lead={l} /></td>
-                  {EXTRA_FIELDS.map((x) => <td key={x.key} className="px-3 py-2 min-w-[9.5rem]"><ExtraSelect lead={l} field={x} /></td>)}
+                  {EXTRA_FIELDS.map((x) => <td key={x.key} className="px-4 py-3 whitespace-nowrap">{l[x.key] || '—'}</td>)}
                   {CLIENT.quickRelance && <td className="px-3 py-2"><RelanceInput lead={l} /></td>}
                   <td className="px-4 py-3 whitespace-nowrap text-muted">
                     {formatDate(l.created_at)}

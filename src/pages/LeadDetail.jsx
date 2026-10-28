@@ -67,10 +67,7 @@ export default function LeadDetail() {
         {EXTRA_FIELDS.map((x) => (
           <div key={x.key}>
             <label className="label">{x.label}</label>
-            <select className="input" value={lead[x.key] || ''} onChange={(e) => save({ [x.key]: e.target.value || null })}>
-              <option value="">—</option>
-              {x.options.map((o) => <option key={o}>{o}</option>)}
-            </select>
+            <p className="input bg-sand/40">{lead[x.key] || '—'}</p>
           </div>
         ))}
         {CLIENT.showAcompte && (
