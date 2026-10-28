@@ -4,14 +4,15 @@ export default {
   theme: {}, // keeps the default cream / soft gold colours from index.css
 
   statuts: ['Nouveau', 'Contacté', 'Pas de réponse', 'Intéressée', 'Acompte payé', 'Confirmée', 'Perdue'],
+  // Colour of the small dot shown next to each status.
   statutStyles: {
-    Nouveau: 'bg-blue-50 text-blue-700 ring-blue-200',
-    Contacté: 'bg-stone-100 text-stone-700 ring-stone-200',
-    'Pas de réponse': 'bg-orange-50 text-orange-700 ring-orange-200',
-    Intéressée: 'bg-yellow-50 text-yellow-800 ring-yellow-200',
-    'Acompte payé': 'bg-emerald-50 text-emerald-700 ring-emerald-200',
-    Confirmée: 'bg-green-100 text-green-800 ring-green-300',
-    Perdue: 'bg-red-50 text-red-700 ring-red-200',
+    Nouveau: 'bg-blue-500',
+    Contacté: 'bg-stone-400',
+    'Pas de réponse': 'bg-orange-500',
+    Intéressée: 'bg-amber-400',
+    'Acompte payé': 'bg-emerald-500',
+    Confirmée: 'bg-green-600',
+    Perdue: 'bg-red-500',
   },
   aRelancer: ['Nouveau', 'Pas de réponse', 'Intéressée'], // still need a call back
   won: ['Acompte payé', 'Confirmée'], // counted in the conversion rate

@@ -4,38 +4,42 @@ import { formatDate, telLink } from '../lib/format'
 import { NoteEditor, RelanceInput, StatusSelect } from './QuickEdit'
 
 // Lead card used on mobile and on the "À relancer" page.
-// Status, note and follow-up date can be changed right here; the name opens the full lead page.
+// Status, note (and follow-up date for some clients) can be changed right here; the name opens the lead page.
 export default function LeadCard({ lead, extra }) {
+  const details = [
+    lead[ITEM.key],
+    ...EXTRA_FIELDS.map((x) => lead[x.key]),
+    SOURCE_LABELS[lead.source],
+    formatDate(lead.created_at),
+  ].filter(Boolean)
+
   return (
-    <div className="card p-4">
+    <div className="card p-3.5">
       <div className="flex items-start justify-between gap-3">
-        <Link to={`/leads/${lead.id}`} className="min-w-0 group">
-          <p className="font-medium truncate group-hover:text-gold-dark">{lead.nom} <span className="text-muted">›</span></p>
-        </Link>
-        <StatusSelect lead={lead} />
+        <div className="min-w-0">
+          <Link to={`/leads/${lead.id}`} className="block truncate text-[15px] font-medium text-ink hover:text-gold">
+            {lead.nom}
+          </Link>
+          <a href={telLink(lead.telephone)} className="text-[13px] tabular-nums text-gold">
+            {lead.telephone}
+          </a>
+          {lead.ville && <span className="text-[13px] text-muted"> · {lead.ville}</span>}
+        </div>
+        <div className="w-40 shrink-0">
+          <StatusSelect lead={lead} />
+        </div>
       </div>
-      <a href={telLink(lead.telephone)} className="text-sm text-gold-dark">
-        {lead.telephone}
-      </a>
-      {lead.ville && <span className="text-sm text-muted"> · {lead.ville}</span>}
-      <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted">
-        {lead[ITEM.key] && <span>{lead[ITEM.key]}</span>}
-        {lead.contact_pref && <span>Contact : {lead.contact_pref}</span>}
-        <span>{SOURCE_LABELS[lead.source]}</span>
-        <span>{formatDate(lead.created_at)}</span>
-        {extra}
-      </div>
-      <div className="mt-3">
+      <p className="mt-2 text-[12px] text-muted">
+        {details.join(' · ')}
+        {lead.contact_pref && ` · Contact : ${lead.contact_pref}`}
+      </p>
+      {extra && <div className="mt-1 text-[12px]">{extra}</div>}
+      <div className="mt-2.5 rounded-md border border-line bg-cream/60">
         <NoteEditor lead={lead} />
       </div>
-      {EXTRA_FIELDS.map((x) => (
-        <p key={x.key} className="mt-2 text-xs text-muted">
-          {x.label} : <b className="font-medium text-ink">{lead[x.key] || '—'}</b>
-        </p>
-      ))}
       {CLIENT.quickRelance && (
-        <div className="mt-2 flex items-center gap-2 text-xs text-muted">
-          <span>Relance :</span>
+        <div className="mt-2 flex items-center gap-2 text-[12px] text-muted">
+          <span>Relance</span>
           <RelanceInput lead={lead} />
         </div>
       )}

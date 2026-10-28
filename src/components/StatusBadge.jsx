@@ -1,12 +1,13 @@
 import { STATUT_STYLES } from '../lib/constants'
 
+export function StatusDot({ statut, className = '' }) {
+  return <span className={`inline-block h-2 w-2 shrink-0 rounded-full ${STATUT_STYLES[statut] || 'bg-stone-400'} ${className}`} />
+}
+
 export default function StatusBadge({ statut }) {
   return (
-    <span
-      className={`inline-flex items-center whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset ${
-        STATUT_STYLES[statut] || 'bg-stone-100 text-stone-700 ring-stone-200'
-      }`}
-    >
+    <span className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-md border border-line bg-white px-2 py-0.5 text-[12px] font-medium text-ink">
+      <StatusDot statut={statut} />
       {statut}
     </span>
   )

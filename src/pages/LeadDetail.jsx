@@ -23,69 +23,93 @@ export default function LeadDetail() {
     }
   }
 
+  const infos = [
+    ['Téléphone', lead.telephone],
+    ['Ville', lead.ville],
+    [ITEM.label, lead[ITEM.key]],
+    ...EXTRA_FIELDS.map((x) => [x.label, lead[x.key]]),
+    ['Préférence de contact', lead.contact_pref],
+    ['Source', SOURCE_LABELS[lead.source]],
+    ['Reçu le', formatDateTime(lead.created_at)],
+    ['Modifié', `${formatDateTime(lead.updated_at)}${lead.updated_by ? ` · ${lead.updated_by}` : ''}`],
+  ].filter(([, v]) => v)
+
   return (
-    <div className="max-w-3xl">
-      <Link to="/leads" className="text-sm text-muted hover:text-ink">← Leads</Link>
+    <div>
+      <Link to="/leads" className="inline-flex items-center gap-1 text-[13px] text-muted hover:text-ink">
+        <span aria-hidden>←</span> Leads
+      </Link>
 
-      <div className="mt-3 flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h1 className="font-serif text-3xl md:text-4xl">{lead.nom}</h1>
-          <p className="text-sm text-muted mt-1">
-            {lead.telephone}{lead.ville ? ` · ${lead.ville}` : ''} · {SOURCE_LABELS[lead.source]}
-          </p>
-          {lead[ITEM.key] && <p className="text-sm mt-1">{ITEM.label} : <b className="font-medium">{lead[ITEM.key]}</b></p>}
-          {lead.contact_pref && <p className="text-sm mt-1">Préfère : <b className="font-medium">{lead.contact_pref}</b></p>}
-        </div>
-        <StatusBadge statut={lead.statut} />
-      </div>
-
-      <div className="mt-5 grid grid-cols-2 gap-3">
-        <a href={telLink(lead.telephone)} className="btn-ghost">
-          <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2Z" /></svg>
-          Appeler
-        </a>
-        <a href={whatsappLink(lead)} target="_blank" rel="noopener noreferrer" className="btn bg-[#25D366] text-white hover:opacity-90">
-          <svg viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Z" /></svg>
-          WhatsApp
-        </a>
-      </div>
-
-      <section className="card mt-5 p-5 grid gap-4 sm:grid-cols-2">
-        <div>
-          <label className="label">Statut</label>
-          <select className="input" value={lead.statut} onChange={(e) => save({ statut: e.target.value })}>
-            {STATUTS.map((s) => <option key={s}>{s}</option>)}
-          </select>
-        </div>
-        <div>
-          <label className="label">Raison</label>
-          <select className="input" value={lead.raison || ''} onChange={(e) => save({ raison: e.target.value || null })}>
-            <option value="">—</option>
-            {RAISONS.map((r) => <option key={r}>{r}</option>)}
-          </select>
-        </div>
-        {EXTRA_FIELDS.map((x) => (
-          <div key={x.key}>
-            <label className="label">{x.label}</label>
-            <p className="input bg-sand/40">{lead[x.key] || '—'}</p>
+      <div className="mt-2 mb-6 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-3">
+          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-sand text-[15px] font-semibold uppercase">
+            {(lead.nom || '?')[0]}
+          </span>
+          <div className="min-w-0">
+            <h1 className="truncate text-[22px] font-semibold tracking-tight">{lead.nom}</h1>
+            <div className="mt-0.5 flex items-center gap-2 text-[13px] text-muted">
+              <StatusBadge statut={lead.statut} />
+              {lead[ITEM.key] && <span>{lead[ITEM.key]}</span>}
+            </div>
           </div>
-        ))}
-        {CLIENT.showAcompte && (
-          <AcompteField key={`a-${lead.montant_acompte}`} value={lead.montant_acompte} onSave={(v) => save({ montant_acompte: v })} />
-        )}
-        <div>
-          <label className="label">Prochaine relance</label>
-          <input type="date" className="input" value={lead.prochaine_relance || ''}
-            onChange={(e) => save({ prochaine_relance: e.target.value || null })} />
         </div>
-        <NotesField key={`n-${lead.notes}`} value={lead.notes} onSave={(v) => save({ notes: v })} />
-        <p className="sm:col-span-2 text-xs text-muted">
-          Reçu le {formatDateTime(lead.created_at)} · Modifié le {formatDateTime(lead.updated_at)}
-          {lead.updated_by ? ` par ${lead.updated_by}` : ''}
-        </p>
-      </section>
+        <div className="flex w-full gap-2 sm:w-auto">
+          <a href={telLink(lead.telephone)} className="btn-ghost flex-1 sm:flex-none">
+            <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2Z" /></svg>
+            Appeler
+          </a>
+          <a href={whatsappLink(lead)} target="_blank" rel="noopener noreferrer" className="btn flex-1 bg-[#1faa59] text-white hover:bg-[#178f4a] sm:flex-none">
+            <svg viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Z" /></svg>
+            WhatsApp
+          </a>
+        </div>
+      </div>
 
-      <History leadId={lead.id} createdAt={lead.created_at} />
+      <div className="grid items-start gap-4 lg:grid-cols-3">
+        <div className="space-y-4 lg:col-span-2">
+          <section className="card">
+            <h2 className="border-b border-line px-5 py-3 text-[14px] font-semibold">Suivi</h2>
+            <div className="grid gap-4 p-5 sm:grid-cols-2">
+              <div>
+                <label className="label">Statut</label>
+                <select className="input" value={lead.statut} onChange={(e) => save({ statut: e.target.value })}>
+                  {STATUTS.map((s) => <option key={s}>{s}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="label">Raison</label>
+                <select className="input" value={lead.raison || ''} onChange={(e) => save({ raison: e.target.value || null })}>
+                  <option value="">—</option>
+                  {RAISONS.map((r) => <option key={r}>{r}</option>)}
+                </select>
+              </div>
+              {CLIENT.showAcompte && (
+                <AcompteField key={`a-${lead.montant_acompte}`} value={lead.montant_acompte} onSave={(v) => save({ montant_acompte: v })} />
+              )}
+              <div>
+                <label className="label">Prochaine relance</label>
+                <input type="date" className="input" value={lead.prochaine_relance || ''}
+                  onChange={(e) => save({ prochaine_relance: e.target.value || null })} />
+              </div>
+              <NotesField key={`n-${lead.notes}`} value={lead.notes} onSave={(v) => save({ notes: v })} />
+            </div>
+          </section>
+
+          <History leadId={lead.id} createdAt={lead.created_at} />
+        </div>
+
+        <section className="card">
+          <h2 className="border-b border-line px-5 py-3 text-[14px] font-semibold">Informations</h2>
+          <dl className="divide-y divide-line">
+            {infos.map(([k, v]) => (
+              <div key={k} className="flex justify-between gap-4 px-5 py-2.5 text-[13px]">
+                <dt className="shrink-0 text-muted">{k}</dt>
+                <dd className="text-right font-medium text-ink">{v}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+      </div>
     </div>
   )
 }
@@ -113,11 +137,11 @@ function NotesField({ value, onSave }) {
   return (
     <div className="sm:col-span-2">
       <label className="label">Notes</label>
-      <textarea rows="4" className="input" value={draft} onChange={(e) => setDraft(e.target.value)}
+      <textarea rows="4" className="input h-auto py-2" value={draft} onChange={(e) => setDraft(e.target.value)}
         placeholder="Ce qui a été dit, disponibilités…" />
       {dirty && (
         <div className="mt-2 flex gap-2">
-          <button className="btn-gold" onClick={() => onSave(draft)}>Enregistrer les notes</button>
+          <button className="btn-gold" onClick={() => onSave(draft)}>Enregistrer</button>
           <button className="btn-ghost" onClick={() => setDraft(value || '')}>Annuler</button>
         </div>
       )}
@@ -156,22 +180,26 @@ function History({ leadId, createdAt }) {
   }
 
   return (
-    <section className="mt-6">
-      <h2 className="text-xs font-medium uppercase tracking-wider text-muted mb-3">Historique</h2>
-      <ol className="card divide-y divide-line">
+    <section className="card">
+      <h2 className="border-b border-line px-5 py-3 text-[14px] font-semibold">Historique</h2>
+      <ol className="px-5 py-4">
         {rows.map((h) => (
-          <li key={h.id} className="p-4 text-sm">
+          <li key={h.id} className="relative border-l border-line pb-4 pl-4 text-[13px]">
+            <span className="absolute -left-[4.5px] top-1.5 h-2 w-2 rounded-full border-2 border-white bg-gold" />
             <p>
-              <b className="font-medium">{FIELD_LABELS[h.field] || h.field}</b>
-              {h.field === 'notes' ? ' modifiées' : <> : <span className="text-muted">{show(h.field, h.old_value)}</span> → {show(h.field, h.new_value)}</>}
+              <span className="font-medium">{FIELD_LABELS[h.field] || h.field}</span>
+              {h.field === 'notes' ? ' modifiées' : <> : <span className="text-muted line-through decoration-muted/40">{show(h.field, h.old_value)}</span> → {show(h.field, h.new_value)}</>}
             </p>
             {h.field === 'notes' && h.new_value && (
-              <p className="mt-1 text-muted whitespace-pre-line line-clamp-3">{h.new_value}</p>
+              <p className="mt-1 line-clamp-3 whitespace-pre-line text-muted">{h.new_value}</p>
             )}
-            <p className="mt-1 text-xs text-muted">{h.changed_by || 'système'} · {formatDateTime(h.changed_at)}</p>
+            <p className="mt-0.5 text-[12px] text-muted">{h.changed_by || 'système'} · {formatDateTime(h.changed_at)}</p>
           </li>
         ))}
-        <li className="p-4 text-sm text-muted">Lead créé le {formatDate(createdAt)}</li>
+        <li className="relative border-l border-transparent pl-4 text-[13px] text-muted">
+          <span className="absolute -left-[4.5px] top-1.5 h-2 w-2 rounded-full bg-line" />
+          Lead créé le {formatDate(createdAt)}
+        </li>
       </ol>
     </section>
   )

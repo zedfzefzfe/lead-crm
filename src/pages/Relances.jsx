@@ -2,6 +2,7 @@ import { useLeads } from '../lib/leads'
 import { A_RELANCER, CLIENT } from '../lib/constants'
 import { formatDate, todayISO } from '../lib/format'
 import LeadCard from '../components/LeadCard'
+import PageHeader from '../components/PageHeader'
 
 // Leads to call back today:
 // - a follow-up date is set → the lead shows from that day on (unless closed: won or lost);
@@ -26,25 +27,29 @@ export default function Relances() {
 
   return (
     <div>
-      <h1 className="font-serif text-3xl md:text-4xl">À relancer aujourd'hui</h1>
-      <p className="text-sm text-muted mt-1">
-        {list.length} lead{list.length > 1 ? 's' : ''} · les plus anciens en premier
-      </p>
+      <PageHeader
+        title="À relancer aujourd'hui"
+        subtitle={`${list.length} lead${list.length > 1 ? 's' : ''} à appeler · les plus anciens en premier`}
+      />
 
-      {loading && <p className="mt-6 text-muted">Chargement…</p>}
+      {loading && <p className="text-muted">Chargement…</p>}
       {!loading && list.length === 0 && (
-        <p className="card mt-6 p-6 text-center text-muted">Tout le monde a été relancé ✨</p>
+        <div className="card px-6 py-12 text-center">
+          <p className="font-medium">Rien à relancer</p>
+          <p className="mt-1 text-[13px] text-muted">Tous les leads ont été traités pour aujourd'hui.</p>
+        </div>
       )}
 
-      <div className="mt-5 grid gap-3 md:grid-cols-2">
+      <div className="grid gap-2.5 md:grid-cols-2 xl:grid-cols-3">
         {list.map((l) => (
           <LeadCard
             key={l.id}
             lead={l}
             extra={
               l.prochaine_relance && (
-                <span className={l.prochaine_relance < today ? 'text-red-600 font-medium' : 'text-gold-dark font-medium'}>
-                  Relance : {l.prochaine_relance === today ? "aujourd'hui" : formatDate(l.prochaine_relance)}
+                <span className={`font-medium ${l.prochaine_relance < today ? 'text-red-600' : 'text-gold'}`}>
+                  Relance {l.prochaine_relance === today ? "aujourd'hui" : `prévue le ${formatDate(l.prochaine_relance)}`}
+                  {l.prochaine_relance < today && ' · en retard'}
                 </span>
               )
             }

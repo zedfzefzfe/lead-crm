@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useLeads } from '../lib/leads'
-import { STATUTS, STATUT_STYLES } from '../lib/constants'
+import { STATUTS } from '../lib/constants'
+import { StatusDot } from './StatusBadge'
 import { toISODate } from '../lib/format'
 
 // Small controls to edit a lead straight from the list (no need to open the lead page).
@@ -17,28 +18,32 @@ function useSave(lead) {
   }
 }
 
-// Status dropdown that looks like the coloured badge.
+// Status dropdown that looks like the status badge (coloured dot + label).
 export function StatusSelect({ lead }) {
   const save = useSave(lead)
   return (
-    <select
-      value={lead.statut}
-      onChange={(e) => save({ statut: e.target.value })}
-      aria-label="Statut"
-      className={`cursor-pointer rounded-full py-1 pl-2.5 pr-6 text-xs font-medium ring-1 ring-inset outline-none appearance-none bg-no-repeat bg-[length:10px] bg-[right_8px_center] bg-[url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23666' fill='none' stroke-width='1.5'/%3E%3C/svg%3E")] ${
-        STATUT_STYLES[lead.statut] || 'bg-stone-100 text-stone-700 ring-stone-200'
-      }`}
-    >
-      {STATUTS.map((s) => (
-        <option key={s} value={s} className="bg-white text-ink">
-          {s}
-        </option>
-      ))}
-    </select>
+    <div className="relative inline-flex w-full max-w-[14rem] items-center">
+      <StatusDot statut={lead.statut} className="pointer-events-none absolute left-2.5" />
+      <select
+        value={lead.statut}
+        onChange={(e) => save({ statut: e.target.value })}
+        aria-label="Statut"
+        className="h-8 w-full cursor-pointer appearance-none rounded-md border border-line bg-white pl-6 pr-7 text-[13px] font-medium text-ink outline-none hover:bg-sand/50 focus:border-gold focus:ring-3 focus:ring-gold/15"
+      >
+        {STATUTS.map((s) => (
+          <option key={s} value={s}>
+            {s}
+          </option>
+        ))}
+      </select>
+      <svg viewBox="0 0 10 6" className="pointer-events-none absolute right-2.5 h-1.5 w-2.5 text-muted" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <path d="M1 1l4 4 4-4" />
+      </svg>
+    </div>
   )
 }
 
-// Note shown beside the lead; tap it, type the result of the call, it saves when you leave the field.
+// Note shown beside the lead; click it, type the result of the call, it saves when you leave the field.
 export function NoteEditor({ lead }) {
   const save = useSave(lead)
   const value = lead.notes || ''
@@ -55,12 +60,26 @@ export function NoteEditor({ lead }) {
     if (draft.trim() !== value.trim()) save({ notes: draft.trim() })
   }
 
+  if (!editing) {
+    return (
+      <button
+        type="button"
+        onClick={() => setEditing(true)}
+        title={value || 'Ajouter une note'}
+        className="block min-h-8 w-full rounded-md border border-transparent px-2.5 py-1.5 text-left text-[13px] leading-snug hover:border-line hover:bg-white"
+      >
+        {value ? <span className="line-clamp-2 whitespace-pre-line text-ink">{value}</span> : <span className="text-muted/70">Ajouter une note…</span>}
+      </button>
+    )
+  }
+
   return (
     <textarea
-      rows={editing ? 3 : draft ? 2 : 1}
+      autoFocus
+      rows={3}
       value={draft}
-      placeholder="Ajouter une note…"
-      onFocus={() => setEditing(true)}
+      placeholder="Résultat de l'appel…"
+      onFocus={(e) => e.currentTarget.setSelectionRange(draft.length, draft.length)}
       onChange={(e) => setDraft(e.target.value)}
       onBlur={commit}
       onKeyDown={(e) => {
@@ -70,14 +89,9 @@ export function NoteEditor({ lead }) {
         } else if (e.key === 'Escape') {
           setDraft(value)
           setEditing(false)
-          e.currentTarget.blur()
         }
       }}
-      className={`w-full resize-none rounded-lg border px-2 py-1.5 text-sm leading-snug outline-none transition ${
-        editing
-          ? 'border-gold bg-white ring-2 ring-gold/20'
-          : 'border-transparent bg-sand/40 hover:border-line overflow-hidden'
-      }`}
+      className="block w-full resize-none rounded-md border border-gold bg-white px-2.5 py-1.5 text-[13px] leading-snug outline-none ring-3 ring-gold/15 placeholder:text-muted/70"
     />
   )
 }
@@ -97,7 +111,7 @@ export function RelanceInput({ lead }) {
         value={value}
         aria-label="Prochaine relance"
         onChange={(e) => save({ prochaine_relance: e.target.value || null })}
-        className={`min-w-0 rounded-lg border px-2 py-1 text-xs outline-none focus:border-gold ${
+        className={`h-8 w-[8.75rem] rounded-md border px-2 text-[13px] outline-none focus:border-gold ${
           late ? 'border-red-200 bg-red-50 text-red-700' : value ? 'border-line bg-white' : 'border-line bg-white text-muted'
         }`}
       />
@@ -115,7 +129,7 @@ export function RelanceInput({ lead }) {
           type="button"
           title="Relancer demain"
           onClick={() => save({ prochaine_relance: tomorrow })}
-          className="whitespace-nowrap rounded-md px-1.5 py-1 text-xs text-gold-dark hover:bg-sand"
+          className="h-8 whitespace-nowrap rounded-md px-2 text-[13px] font-medium text-gold hover:bg-sand"
         >
           Demain
         </button>

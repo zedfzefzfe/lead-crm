@@ -1,44 +1,49 @@
 @import "tailwindcss";
 
+/* Design tokens. Each client can override them in src/clients/<name>.js (theme). */
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-serif: "Cormorant Garamond", ui-serif, Georgia, serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
 
-  --color-cream: #faf6ef;
-  --color-sand: #f1e9dc;
-  --color-line: #e6dccb;
-  --color-ink: #3b3128;
-  --color-muted: #8a7d6c;
-  --color-gold: #b8924a;
-  --color-gold-dark: #9a7a3b;
+  --color-cream: #f8f7f5;      /* page background */
+  --color-sand: #f1efeb;       /* subtle fills: hover, table header, active nav */
+  --color-line: #e6e3de;       /* borders */
+  --color-ink: #1c1917;        /* main text */
+  --color-muted: #78716c;      /* secondary text */
+  --color-gold: #a17a35;       /* accent (buttons, links, focus) */
+  --color-gold-dark: #85632a;  /* accent hover */
 }
 
 body {
-  @apply bg-cream text-ink font-sans antialiased;
+  @apply bg-cream text-ink font-sans antialiased text-[14px];
+  font-feature-settings: "cv11", "ss01";
 }
 
 @utility card {
-  @apply bg-white/80 border border-line rounded-2xl shadow-[0_1px_2px_rgba(59,49,40,0.04)];
+  @apply bg-white border border-line rounded-lg shadow-[0_1px_2px_rgba(16,24,40,0.04)];
 }
 
 @utility input {
-  @apply w-full rounded-xl border border-line bg-white px-3 py-2.5 text-[15px] text-ink outline-none
-         focus:border-gold focus:ring-2 focus:ring-gold/20;
+  @apply w-full h-9 rounded-md border border-line bg-white px-3 text-[14px] text-ink outline-none
+         placeholder:text-muted/70 focus:border-gold focus:ring-3 focus:ring-gold/15;
 }
 
 @utility label {
-  @apply block text-xs font-medium uppercase tracking-wider text-muted mb-1.5;
+  @apply block text-[13px] font-medium text-ink mb-1.5;
 }
 
 @utility btn {
-  @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium
-         transition disabled:opacity-50;
+  @apply inline-flex h-9 items-center justify-center gap-2 rounded-md px-3.5 text-[14px] font-medium
+         transition-colors disabled:opacity-50 whitespace-nowrap;
 }
 
 @utility btn-gold {
-  @apply btn bg-gold text-white hover:bg-gold-dark;
+  @apply btn bg-gold text-white hover:bg-gold-dark shadow-[0_1px_2px_rgba(16,24,40,0.08)];
 }
 
 @utility btn-ghost {
   @apply btn border border-line bg-white text-ink hover:bg-sand;
+}
+
+@utility eyebrow {
+  @apply text-[12px] font-medium text-muted;
 }

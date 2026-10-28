@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import PageHeader from '../components/PageHeader'
 import { useLeads } from '../lib/leads'
 import { EXTRA_FIELDS, ITEM, SOURCES, SOURCE_LABELS, STATUTS } from '../lib/constants'
 
@@ -48,11 +49,10 @@ export default function AddLead() {
   }
 
   return (
-    <div className="max-w-xl">
-      <h1 className="font-serif text-3xl md:text-4xl">Ajouter un lead</h1>
-      <p className="text-sm text-muted mt-1">Pour les demandes reçues sur WhatsApp ou Instagram.</p>
+    <div className="max-w-2xl">
+      <PageHeader title="Ajouter un lead" subtitle="Pour les demandes reçues sur WhatsApp, Instagram ou par téléphone." />
 
-      <form onSubmit={submit} className="card mt-5 p-5 grid gap-4 sm:grid-cols-2">
+      <form onSubmit={submit} className="card grid gap-4 p-5 sm:grid-cols-2 sm:p-6">
         <div className="sm:col-span-2">
           <label className="label">Nom *</label>
           <input required className="input" value={form.nom} onChange={set('nom')} />
@@ -98,10 +98,13 @@ export default function AddLead() {
         </div>
         <div className="sm:col-span-2">
           <label className="label">Notes</label>
-          <textarea rows="3" className="input" value={form.notes} onChange={set('notes')} />
+          <textarea rows="3" className="input h-auto py-2" value={form.notes} onChange={set('notes')} />
         </div>
-        {error && <p className="sm:col-span-2 text-sm text-red-600">{error}</p>}
-        <button className="btn-gold sm:col-span-2" disabled={busy}>{busy ? 'Enregistrement…' : 'Enregistrer le lead'}</button>
+        {error && <p className="sm:col-span-2 text-[13px] text-red-600">{error}</p>}
+        <div className="flex justify-end gap-2 border-t border-line pt-4 sm:col-span-2">
+          <button type="button" className="btn-ghost" onClick={() => navigate(-1)}>Annuler</button>
+          <button className="btn-gold" disabled={busy}>{busy ? 'Enregistrement…' : 'Enregistrer le lead'}</button>
+        </div>
       </form>
     </div>
   )

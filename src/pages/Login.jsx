@@ -19,10 +19,13 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen grid place-items-center px-5 bg-gradient-to-b from-cream to-sand">
-      <form onSubmit={submit} className="card w-full max-w-sm p-8">
-        <p className="font-serif text-4xl text-center">{CLIENT.brand.name}</p>
-        <p className="text-center text-[10px] uppercase tracking-[0.3em] text-gold mb-8">{CLIENT.brand.tagline}</p>
+    <div className="grid min-h-screen place-items-center bg-cream px-5">
+      <form onSubmit={submit} className="card w-full max-w-sm p-7">
+        <span className="grid h-10 w-10 place-items-center rounded-lg bg-gold text-[17px] font-bold text-white">
+          {CLIENT.brand.name[0]}
+        </span>
+        <h1 className="mt-5 text-[20px] font-semibold tracking-tight">Connexion</h1>
+        <p className="mb-6 mt-0.5 text-[13px] text-muted">{CLIENT.brand.name} · {CLIENT.brand.tagline}</p>
 
         <label className="label" htmlFor="email">Email</label>
         <input id="email" type="email" autoComplete="email" required className="input mb-4"
@@ -32,7 +35,7 @@ export default function Login() {
         <input id="password" type="password" autoComplete="current-password" required className="input mb-5"
           value={password} onChange={(e) => setPassword(e.target.value)} />
 
-        {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
+        {error && <p className="mb-4 rounded-md bg-red-50 px-3 py-2 text-[13px] text-red-700">{error}</p>}
 
         <button className="btn-gold w-full" disabled={busy}>{busy ? 'Connexion…' : 'Se connecter'}</button>
       </form>

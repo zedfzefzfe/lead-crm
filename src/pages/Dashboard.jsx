@@ -2,6 +2,8 @@ import { Link } from 'react-router-dom'
 import { useLeads } from '../lib/leads'
 import { CLIENT, EXTRA_FIELDS, ITEM, STATUTS, STATUT_STYLES, SOURCE_LABELS } from '../lib/constants'
 import { formatMAD } from '../lib/format'
+import PageHeader from '../components/PageHeader'
+import { StatusDot } from '../components/StatusBadge'
 
 function startOfToday() {
   const d = new Date()
@@ -24,7 +26,7 @@ function startOfMonth() {
 function countBy(list, key) {
   const out = {}
   for (const item of list) {
-    const k = item[key] || '—'
+    const k = item[key] || 'Non renseigné'
     out[k] = (out[k] || 0) + 1
   }
   return Object.entries(out).sort((a, b) => b[1] - a[1])
@@ -43,78 +45,94 @@ export default function Dashboard() {
   const perStatut = Object.fromEntries(STATUTS.map((s) => [s, 0]))
   leads.forEach((l) => (perStatut[l.statut] = (perStatut[l.statut] || 0) + 1))
 
+  const kpis = [
+    { label: "Aujourd'hui", value: since(startOfToday()) },
+    { label: 'Cette semaine', value: since(startOfWeek()) },
+    { label: 'Ce mois', value: since(startOfMonth()) },
+    { label: 'Taux de conversion', value: `${conversion} %`, hint: CLIENT.won.join(' + ') },
+    ...(CLIENT.showAcompte ? [{ label: 'Acomptes encaissés', value: formatMAD(deposits) }] : []),
+  ]
+
   return (
     <div>
-      <h1 className="font-serif text-3xl md:text-4xl">Tableau de bord</h1>
-      <p className="text-sm text-muted mt-1">{leads.length} leads au total</p>
+      <PageHeader title="Tableau de bord" subtitle={`${leads.length} leads au total`} />
 
-      <section className="mt-6 grid grid-cols-3 gap-3">
-        <Kpi label="Aujourd'hui" value={since(startOfToday())} />
-        <Kpi label="Cette semaine" value={since(startOfWeek())} />
-        <Kpi label="Ce mois" value={since(startOfMonth())} />
-      </section>
-
-      <section className="mt-3 grid grid-cols-2 gap-3">
-        <Kpi label="Taux de conversion" value={`${conversion} %`} hint={CLIENT.won.join(' + ')} gold />
-        <Kpi label="Acomptes encaissés" value={formatMAD(deposits)} gold />
-      </section>
-
-      <h2 className="mt-8 mb-3 text-xs font-medium uppercase tracking-wider text-muted">Par statut</h2>
-      <section className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
-        {STATUTS.map((s) => (
-          <Link key={s} to={`/leads?statut=${encodeURIComponent(s)}`}
-            className={`rounded-2xl p-4 ring-1 ring-inset ${STATUT_STYLES[s]} hover:opacity-90`}>
-            <p className="text-2xl font-semibold">{perStatut[s]}</p>
-            <p className="text-xs mt-1">{s}</p>
-          </Link>
+      {/* Key numbers */}
+      <section className="card grid grid-cols-2 divide-line md:grid-cols-5 md:divide-x">
+        {kpis.map((k, i) => (
+          <div key={k.label} className={`px-5 py-4 ${i > 1 ? 'border-t border-line md:border-t-0' : ''} ${i === 4 ? 'col-span-2 md:col-span-1' : ''}`}>
+            <p className="eyebrow">{k.label}</p>
+            <p className="mt-1 text-[26px] font-semibold tracking-tight tabular-nums">{k.value}</p>
+            {k.hint && <p className="text-[12px] text-muted">{k.hint}</p>}
+          </div>
         ))}
       </section>
 
-      <section className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        <Breakdown title="Par source" rows={countBy(leads, 'source').map(([k, v]) => [SOURCE_LABELS[k] || k, v])} total={leads.length} />
-        <Breakdown title={`Par ${ITEM.label.toLowerCase()}`} rows={countBy(leads, ITEM.key)} total={leads.length} />
-        {EXTRA_FIELDS.map((x) => (
-          <Breakdown key={x.key} title={`Par ${x.label.toLowerCase()}`} rows={countBy(leads, x.key)} total={leads.length} />
-        ))}
+      <div className="mt-4 grid gap-4 lg:grid-cols-3">
+        {/* Pipeline by status */}
+        <section className="card lg:col-span-2">
+          <CardTitle>Pipeline</CardTitle>
+          <ul className="divide-y divide-line">
+            {STATUTS.map((s) => (
+              <li key={s}>
+                <Link to={`/leads?statut=${encodeURIComponent(s)}`} className="flex items-center gap-3 px-5 py-2.5 hover:bg-sand/40">
+                  <StatusDot statut={s} />
+                  <span className="w-36 shrink-0 text-[13px]">{s}</span>
+                  <div className="h-1.5 flex-1 rounded-full bg-sand">
+                    <div className={`h-1.5 rounded-full ${STATUT_STYLES[s]}`} style={{ width: `${leads.length ? (perStatut[s] / leads.length) * 100 : 0}%` }} />
+                  </div>
+                  <span className="w-8 text-right text-[13px] font-medium tabular-nums">{perStatut[s]}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+
         <Breakdown
           title="Raisons des leads perdus"
           rows={countBy(leads.filter((l) => l.statut === CLIENT.lost), 'raison')}
           total={perStatut[CLIENT.lost]}
           empty="Aucun lead perdu"
         />
-      </section>
+      </div>
+
+      <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <Breakdown title="Par source" rows={countBy(leads, 'source').map(([k, v]) => [SOURCE_LABELS[k] || k, v])} total={leads.length} />
+        <Breakdown title={`Par ${ITEM.label.toLowerCase()}`} rows={countBy(leads, ITEM.key)} total={leads.length} />
+        {EXTRA_FIELDS.map((x) => (
+          <Breakdown key={x.key} title={`Par ${x.label.toLowerCase()}`} rows={countBy(leads, x.key)} total={leads.length} />
+        ))}
+      </div>
     </div>
   )
 }
 
-function Kpi({ label, value, hint, gold }) {
-  return (
-    <div className={`card p-4 ${gold ? 'bg-gradient-to-br from-white to-sand' : ''}`}>
-      <p className="text-[11px] uppercase tracking-wider text-muted">{label}</p>
-      <p className={`mt-1 text-2xl md:text-3xl font-semibold ${gold ? 'text-gold-dark' : ''}`}>{value}</p>
-      {hint && <p className="text-[11px] text-muted mt-1">{hint}</p>}
-    </div>
-  )
+function CardTitle({ children }) {
+  return <h2 className="border-b border-line px-5 py-3 text-[14px] font-semibold">{children}</h2>
 }
 
 function Breakdown({ title, rows, total, empty = 'Aucune donnée' }) {
   return (
-    <div className="card p-5">
-      <h3 className="text-xs font-medium uppercase tracking-wider text-muted mb-4">{title}</h3>
-      {rows.length === 0 && <p className="text-sm text-muted">{empty}</p>}
-      <ul className="space-y-3">
-        {rows.map(([name, n]) => (
-          <li key={name}>
-            <div className="flex justify-between text-sm">
-              <span className="truncate pr-2">{name}</span>
-              <span className="font-medium">{n}</span>
-            </div>
-            <div className="mt-1 h-1.5 rounded-full bg-sand">
-              <div className="h-1.5 rounded-full bg-gold" style={{ width: `${total ? (n / total) * 100 : 0}%` }} />
-            </div>
-          </li>
-        ))}
-      </ul>
-    </div>
+    <section className="card">
+      <CardTitle>{title}</CardTitle>
+      <div className="px-5 py-4">
+        {rows.length === 0 && <p className="text-[13px] text-muted">{empty}</p>}
+        <ul className="space-y-3">
+          {rows.map(([name, n]) => (
+            <li key={name}>
+              <div className="flex justify-between text-[13px]">
+                <span className="truncate pr-2">{name}</span>
+                <span className="font-medium tabular-nums">
+                  {n} <span className="font-normal text-muted">· {total ? Math.round((n / total) * 100) : 0} %</span>
+                </span>
+              </div>
+              <div className="mt-1.5 h-1.5 rounded-full bg-sand">
+                <div className="h-1.5 rounded-full bg-gold" style={{ width: `${total ? (n / total) * 100 : 0}%` }} />
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
   )
 }
