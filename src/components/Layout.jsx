@@ -13,6 +13,9 @@ const NAV = [
   { to: '/ajouter', label: 'nav.add', short: 'nav.add.short', icon: 'M12 5v14M5 12h14' },
 ]
 
+// Shown only to admins (see supabase/admin.sql).
+const ADMIN_NAV = { to: '/admin', label: 'nav.admin', short: 'nav.admin.short', icon: 'M12 3l7 3v5c0 4.5-3 8.3-7 10-4-1.7-7-5.5-7-10V6l7-3ZM9 12l2 2 4-4' }
+
 function Icon({ d, className = 'h-[18px] w-[18px]' }) {
   return (
     <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
@@ -22,7 +25,8 @@ function Icon({ d, className = 'h-[18px] w-[18px]' }) {
 }
 
 export default function Layout({ user, children }) {
-  const { toasts } = useLeads()
+  const { toasts, isAdmin } = useLeads()
+  const nav = isAdmin ? [...NAV, ADMIN_NAV] : NAV
   const relanceCount = useRelances().length
   const logout = () => supabase.auth.signOut()
 
@@ -34,7 +38,7 @@ export default function Layout({ user, children }) {
           <Brand />
         </div>
         <nav className="flex flex-col gap-0.5 p-3">
-          {NAV.map((n) => (
+          {nav.map((n) => (
             <NavLink
               key={n.to}
               to={n.to}
@@ -75,8 +79,8 @@ export default function Layout({ user, children }) {
       </main>
 
       {/* Mobile bottom nav */}
-      <nav className="fixed inset-x-0 bottom-0 z-20 grid grid-cols-4 border-t border-line bg-white pb-[env(safe-area-inset-bottom)] md:hidden">
-        {NAV.map((n) => (
+      <nav className={`fixed inset-x-0 bottom-0 z-20 grid ${isAdmin ? 'grid-cols-5' : 'grid-cols-4'} border-t border-line bg-white pb-[env(safe-area-inset-bottom)] md:hidden`}>
+        {nav.map((n) => (
           <NavLink
             key={n.to}
             to={n.to}

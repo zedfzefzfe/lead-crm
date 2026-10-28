@@ -134,3 +134,16 @@ conversion = Vendu ÷ total; a **Modèle** field (instead of Atelier) and a **Pa
    Put the Bajaj Supabase URL and publishable key at the top of that file. It sends nom (prénom + nom), téléphone, modèle,
    paiement and source = landing. Fire-and-forget: errors are only logged, EmailJS / Pixel / "Merci !" are never affected.
 
+
+## 8. Administration (delete leads)
+
+Only admin accounts can delete leads; the database refuses deletes from everyone else.
+
+1. Supabase → SQL Editor → paste [`supabase/admin.sql`](supabase/admin.sql), replace `VOTRE_EMAIL@exemple.com`
+   on the last line by the admin's login email, and Run (once per project: Crea'rt and/or Bajaj).
+2. Log out and back in to the CRM (or refresh): an **Administration** menu appears for that account only.
+3. Tick the leads (or "Tout sélectionner"), click **Supprimer**, confirm. Deleted leads (and their history)
+   disappear for the whole team in real time. This cannot be undone.
+
+Add another admin: `insert into public.admins (email) values ('other@email.com');`
+Remove one: `delete from public.admins where email = 'other@email.com';`

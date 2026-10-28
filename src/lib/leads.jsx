@@ -27,6 +27,12 @@ export function LeadsProvider({ children }) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [toasts, setToasts] = useState([])
+  const [isAdmin, setIsAdmin] = useState(false)
+
+  // Is the logged-in user in the admins list? (false if supabase/admin.sql was not run)
+  useEffect(() => {
+    supabase.rpc('is_admin').then(({ data, error }) => setIsAdmin(!error && data === true))
+  }, [])
 
   const notify = useCallback((text) => {
     const id = crypto.randomUUID()
@@ -80,6 +86,15 @@ export function LeadsProvider({ children }) {
     return data
   }, [])
 
+  // Admins only (checked by the database). Returns how many leads were really deleted.
+  const deleteLeads = useCallback(async (ids) => {
+    const { data, error } = await supabase.from('leads').delete().in('id', ids).select('id')
+    if (error) throw error
+    const gone = new Set(data.map((d) => d.id))
+    setLeads((list) => list.filter((l) => !gone.has(l.id)))
+    return gone.size
+  }, [])
+
   const addLead = useCallback(async (lead) => {
     const { data, error } = await supabase.from('leads').insert(lead).select().single()
     if (error) throw error
@@ -88,7 +103,7 @@ export function LeadsProvider({ children }) {
   }, [])
 
   return (
-    <LeadsContext.Provider value={{ leads, loading, error, updateLead, addLead, toasts, notify }}>
+    <LeadsContext.Provider value={{ leads, loading, error, updateLead, addLead, deleteLeads, isAdmin, toasts, notify }}>
       {children}
     </LeadsContext.Provider>
   )

@@ -10,6 +10,7 @@ import Leads from './pages/Leads'
 import LeadDetail from './pages/LeadDetail'
 import Relances from './pages/Relances'
 import AddLead from './pages/AddLead'
+import Admin from './pages/Admin'
 
 export default function App() {
   const [session, setSession] = useState(undefined)
@@ -41,6 +42,7 @@ export default function App() {
           <Route path="/leads/:id" element={<LeadDetail />} />
           <Route path="/relances" element={<Relances />} />
           <Route path="/ajouter" element={<AddLead />} />
+          <Route path="/admin" element={<Admin />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Layout>

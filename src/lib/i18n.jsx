@@ -119,6 +119,27 @@ const UI = {
   'hist.system': { fr: 'système', en: 'system', ar: 'النظام' },
   'hist.created': { fr: 'Lead créé le {x}', en: 'Lead created on {x}', ar: 'أُنشئ العميل يوم {x}' },
 
+  // Administration (admins only)
+  'nav.admin': { fr: 'Administration', en: 'Administration', ar: 'الإدارة' },
+  'nav.admin.short': { fr: 'Admin', en: 'Admin', ar: 'الإدارة' },
+  'admin.subtitle': { fr: 'Sélectionnez les leads à supprimer définitivement.', en: 'Select the leads to delete permanently.', ar: 'اختر العملاء الذين تريد حذفهم نهائياً.' },
+  'admin.selectAll': { fr: 'Tout sélectionner', en: 'Select all', ar: 'تحديد الكل' },
+  'admin.selected': { fr: '{x} sélectionné(s)', en: '{x} selected', ar: '{x} محدد' },
+  'admin.delete': { fr: 'Supprimer', en: 'Delete', ar: 'حذف' },
+  'admin.deleteN': { fr: 'Supprimer ({x})', en: 'Delete ({x})', ar: 'حذف ({x})' },
+  'admin.clear': { fr: 'Désélectionner', en: 'Clear selection', ar: 'إلغاء التحديد' },
+  'admin.confirmTitle': { fr: 'Supprimer {x} lead(s) ?', en: 'Delete {x} lead(s)?', ar: 'حذف {x} عميل؟' },
+  'admin.confirmText': {
+    fr: 'Les leads sélectionnés et leur historique seront supprimés définitivement pour toute l’équipe. Cette action est irréversible.',
+    en: 'The selected leads and their history will be permanently deleted for the whole team. This cannot be undone.',
+    ar: 'سيتم حذف العملاء المحددين وسجلهم نهائياً لكل الفريق. لا يمكن التراجع عن هذا الإجراء.',
+  },
+  'admin.deleting': { fr: 'Suppression…', en: 'Deleting…', ar: 'جارٍ الحذف…' },
+  'admin.deleted': { fr: '{x} lead(s) supprimé(s)', en: '{x} lead(s) deleted', ar: 'تم حذف {x} عميل' },
+  'admin.notAllowed': { fr: "Suppression refusée : ce compte n'est pas administrateur.", en: 'Delete refused: this account is not an admin.', ar: 'تم رفض الحذف: هذا الحساب ليس مسؤولاً.' },
+  'admin.noAccess': { fr: 'Cette page est réservée aux administrateurs.', en: 'This page is for admins only.', ar: 'هذه الصفحة مخصصة للمسؤولين فقط.' },
+  'admin.badge': { fr: 'Admin', en: 'Admin', ar: 'مسؤول' },
+
   // Add lead
   'add.subtitle': { fr: 'Pour les demandes reçues sur WhatsApp, Instagram ou par téléphone.', en: 'For requests received on WhatsApp, Instagram or by phone.', ar: 'للطلبات الواردة عبر واتساب أو انستغرام أو الهاتف.' },
   'add.name': { fr: 'Nom *', en: 'Name *', ar: 'الاسم *' },
