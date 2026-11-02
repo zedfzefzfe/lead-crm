@@ -49,7 +49,7 @@ export default {
     {
       key: 'situation_pro', // filled by the website form, only for credit buyers (optional)
       label: 'Situation pro.',
-      options: ['Salarié CDI (plus d’1 an)', 'Salarié CDD', 'Auto-entrepreneur', 'Chef d’entreprise / Société', 'Retraité', 'Secteur informel', 'Autre'],
+      options: ['Salarié CDI (plus d’1 an)', 'Salarié CDD', 'Auto-entrepreneur', 'Chef d’entreprise / Société', 'Retraité', 'Militaire / Forces auxiliaires', 'Secteur informel', 'Autre'],
     },
   ],
   showAcompte: true,

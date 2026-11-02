@@ -203,6 +203,7 @@ const VALUES = {
   'Auto-entrepreneur': { en: 'Self-employed', ar: 'مقاول ذاتي' },
   'Chef d’entreprise / Société': { en: 'Business owner / Company', ar: 'صاحب مقاولة / شركة' },
   'Retraité': { en: 'Retired', ar: 'متقاعد' },
+  'Militaire / Forces auxiliaires': { en: 'Military / Auxiliary forces', ar: 'عسكري / القوات المساعدة' },
   'Secteur informel': { en: 'Informal sector', ar: 'القطاع غير المهيكل' },
 }
 
