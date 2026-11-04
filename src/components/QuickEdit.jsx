@@ -139,3 +139,26 @@ export function RelanceInput({ lead }) {
   )
 }
 
+
+// "Éligible" toggle (Bajaj): the salesperson confirmed on the phone that the client qualifies
+// for credit or cash. Only updates the `eligible` field; independent of the status.
+export function EligibleToggle({ lead }) {
+  const save = useSave(lead)
+  const on = lead.eligible === true
+  return (
+    <button
+      type="button"
+      onClick={() => save({ eligible: !on })}
+      title={t('eligible.tooltip')}
+      aria-pressed={on}
+      className={`inline-flex h-7 items-center gap-1 whitespace-nowrap rounded-md border px-2 text-[12px] font-semibold transition-colors ${
+        on ? 'border-green-600 bg-green-600 text-white hover:bg-green-700' : 'border-green-600 bg-white text-green-700 hover:bg-green-50'
+      }`}
+    >
+      <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M5 12.5l4.5 4.5L19 7.5" />
+      </svg>
+      {on ? t('eligible.on') : t('eligible.mark')}
+    </button>
+  )
+}

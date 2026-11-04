@@ -7,6 +7,7 @@ import { t } from './i18n'
 
 const LeadsContext = createContext(null)
 const PAGE = 1000
+const FB_FIELDS = ['fb_fbc', 'fb_fbp', 'fb_fbclid']
 
 async function fetchAllLeads() {
   const rows = []
@@ -96,7 +97,13 @@ export function LeadsProvider({ children }) {
   }, [])
 
   const addLead = useCallback(async (lead) => {
-    const { data, error } = await supabase.from('leads').insert(lead).select().single()
+    // Meta identifiers are stored when present; when absent they are not sent (the column stays null).
+    const row = { ...lead }
+    for (const k of FB_FIELDS) {
+      if (row[k] === undefined || row[k] === null || String(row[k]).trim() === '') delete row[k]
+      else row[k] = String(row[k]).trim()
+    }
+    const { data, error } = await supabase.from('leads').insert(row).select().single()
     if (error) throw error
     setLeads((list) => (list.some((l) => l.id === data.id) ? list : [data, ...list]))
     return data

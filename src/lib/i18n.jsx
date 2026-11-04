@@ -68,6 +68,13 @@ const UI = {
   'col.client': { fr: 'Client', en: 'Customer', ar: 'العميل' },
   'col.note': { fr: 'Note', en: 'Note', ar: 'ملاحظة' },
   'col.contactPref': { fr: 'Contact souhaité', en: 'Preferred contact', ar: 'طريقة التواصل المفضلة' },
+  'eligible.mark': { fr: 'Marquer éligible', en: 'Mark eligible', ar: 'تحديد كمؤهل' },
+  'eligible.on': { fr: 'Éligible', en: 'Eligible', ar: 'مؤهل' },
+  'eligible.tooltip': {
+    fr: 'Cliquez uniquement si le client est confirmé éligible au crédit ou cash (au téléphone).',
+    en: 'Click only if the customer is confirmed eligible for credit or cash (on the phone).',
+    ar: 'اضغط فقط إذا تم تأكيد أهلية العميل للقرض أو الدفع نقداً (عبر الهاتف).',
+  },
   'col.relance': { fr: 'Relance', en: 'Follow-up', ar: 'المتابعة' },
   'col.received': { fr: 'Reçu', en: 'Received', ar: 'تاريخ الاستلام' },
   deposit: { fr: 'Acompte {x}', en: 'Deposit {x}', ar: 'عربون {x}' },

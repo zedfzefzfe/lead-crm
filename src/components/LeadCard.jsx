@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { CLIENT, EXTRA_FIELDS, ITEM, SOURCE_LABELS } from '../lib/constants'
 import { formatDate, telLink } from '../lib/format'
-import { NoteEditor, RelanceInput, StatusSelect } from './QuickEdit'
+import { EligibleToggle, NoteEditor, RelanceInput, StatusSelect } from './QuickEdit'
 import ContactPref from './ContactPref'
 import { t, tv } from '../lib/i18n'
 
@@ -43,6 +43,11 @@ export default function LeadCard({ lead, extra }) {
       <div className="mt-2.5 rounded-md border border-line bg-cream/60">
         <NoteEditor lead={lead} />
       </div>
+      {CLIENT.eligibleButton && (
+        <div className="mt-2">
+          <EligibleToggle lead={lead} />
+        </div>
+      )}
       {CLIENT.quickRelance && (
         <div className="mt-2 flex items-center gap-2 text-[12px] text-muted">
           <span>{t('col.relance')}</span>
