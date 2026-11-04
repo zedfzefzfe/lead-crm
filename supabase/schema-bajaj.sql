@@ -185,3 +185,8 @@ drop trigger if exists leads_keep_eligible on public.leads;
 create trigger leads_keep_eligible
   before update on public.leads
   for each row execute function public.leads_keep_eligible();
+
+-- ---------- 8. Meta Conversions API "QualifiedLead" (server-side) ----------
+-- Run these two files from supabase/migrations/ (not repeated here, they are long):
+--   20261107_bajaj_capi_qualified.sql   columns eligible_marked_at / capi_sent_at + job functions
+--   20261107_bajaj_capi_cron.sql        every 15 min, Supabase calls /api/capi-qualified

@@ -147,3 +147,16 @@ Only admin accounts can delete leads; the database refuses deletes from everyone
 
 Add another admin: `insert into public.admins (email) values ('other@email.com');`
 Remove one: `delete from public.admins where email = 'other@email.com';`
+
+## Bajaj — Meta Conversions API "QualifiedLead"
+
+When a salesperson marks a lead **Éligible** and it is still eligible **2 hours later**, a
+server-side `QualifiedLead` event is sent to Meta (dataset `1438254284514631`), once per lead.
+
+- `supabase/migrations/20261107_bajaj_capi_qualified.sql`: columns `eligible_marked_at`,
+  `capi_sent_at`, and the job functions (protected by a random secret kept in the database).
+- `supabase/migrations/20261107_bajaj_capi_cron.sql`: Supabase pg_cron calls
+  `POST /api/capi-qualified` every 15 minutes.
+- `functions/api/capi-qualified.js` + `server/capi.js`: Cloudflare Pages Function that builds and
+  sends the events. Env: `META_CAPI_TOKEN` (secret), optional `META_CAPI_TEST_CODE`.
+- A Meta error never affects the CRM: it is logged and retried on the next run.
