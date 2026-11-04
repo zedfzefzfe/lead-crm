@@ -162,3 +162,24 @@ alter table public.leads add column if not exists eligible boolean not null defa
 alter table public.leads add column if not exists fb_fbc text;
 alter table public.leads add column if not exists fb_fbp text;
 alter table public.leads add column if not exists fb_fbclid text;
+
+-- ---------- 7. "Éligible" is final ----------
+-- Same as supabase/migrations/20261105_bajaj_eligible_final.sql
+
+create or replace function public.leads_keep_eligible()
+returns trigger
+language plpgsql
+set search_path = public
+as $$
+begin
+  if old.eligible is true and new.eligible is distinct from true then
+    new.eligible := true;
+  end if;
+  return new;
+end;
+$$;
+
+drop trigger if exists leads_keep_eligible on public.leads;
+create trigger leads_keep_eligible
+  before update on public.leads
+  for each row execute function public.leads_keep_eligible();

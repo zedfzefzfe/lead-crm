@@ -4,7 +4,7 @@ import PageHeader from '../components/PageHeader'
 import { t } from '../lib/i18n'
 
 // Leads a salesperson confirmed as eligible (credit or cash) after the phone call (Bajaj).
-// Most recently updated first. Un-marking a lead removes it from this page.
+// Most recently updated first. Marking is final, so a lead never leaves this page.
 export function useEligibles() {
   const { leads } = useLeads()
   return leads.filter((l) => l.eligible === true).sort((a, b) => (b.updated_at || '').localeCompare(a.updated_at || ''))
