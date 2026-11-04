@@ -80,6 +80,7 @@ create table if not exists capi_private.settings (
   secret text not null
 );
 revoke all on capi_private.settings from public, anon, authenticated;
+alter table capi_private.settings enable row level security; -- extra lock; the job functions run as owner
 
 -- Random secret, generated once. Nobody has to copy it anywhere: the scheduler reads it here.
 insert into capi_private.settings (id, secret)
