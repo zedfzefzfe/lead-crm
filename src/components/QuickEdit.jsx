@@ -141,24 +141,57 @@ export function RelanceInput({ lead }) {
 
 
 // "Éligible" toggle (Bajaj): the salesperson confirmed on the phone that the client qualifies
-// for credit or cash. Only updates the `eligible` field; independent of the status.
+// for credit or cash. Marking asks for one confirmation; un-marking does not.
+// Only updates the `eligible` field; independent of the status.
 export function EligibleToggle({ lead }) {
   const save = useSave(lead)
   const on = lead.eligible === true
+  const [confirming, setConfirming] = useState(false)
+  const [busy, setBusy] = useState(false)
+
+  const confirm = async () => {
+    setBusy(true)
+    await save({ eligible: true })
+    setBusy(false)
+    setConfirming(false)
+  }
+
   return (
-    <button
-      type="button"
-      onClick={() => save({ eligible: !on })}
-      title={t('eligible.tooltip')}
-      aria-pressed={on}
-      className={`inline-flex h-7 items-center gap-1 whitespace-nowrap rounded-md border px-2 text-[12px] font-semibold transition-colors ${
-        on ? 'border-green-600 bg-green-600 text-white hover:bg-green-700' : 'border-green-600 bg-white text-green-700 hover:bg-green-50'
-      }`}
-    >
-      <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-        <path d="M5 12.5l4.5 4.5L19 7.5" />
-      </svg>
-      {on ? t('eligible.on') : t('eligible.mark')}
-    </button>
+    <>
+      <button
+        type="button"
+        onClick={() => (on ? save({ eligible: false }) : setConfirming(true))}
+        title={t('eligible.tooltip')}
+        aria-pressed={on}
+        className={`inline-flex h-7 items-center gap-1 whitespace-nowrap rounded-md border px-2 text-[12px] font-semibold transition-colors ${
+          on ? 'border-green-600 bg-green-600 text-white hover:bg-green-700' : 'border-green-600 bg-white text-green-700 hover:bg-green-50'
+        }`}
+      >
+        <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M5 12.5l4.5 4.5L19 7.5" />
+        </svg>
+        {on ? t('eligible.on') : t('eligible.mark')}
+      </button>
+
+      {confirming && (
+        <div className="fixed inset-0 z-40 grid place-items-center bg-ink/40 px-4" onClick={() => !busy && setConfirming(false)}>
+          <div className="card w-full max-w-md p-6 text-start" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
+            <div className="mb-4 grid h-10 w-10 place-items-center rounded-full bg-green-50 text-green-700">
+              <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z" />
+              </svg>
+            </div>
+            <h2 className="whitespace-normal text-[17px] font-semibold text-ink">{t('eligible.confirmTitle')}</h2>
+            <p className="mt-1.5 whitespace-normal text-[14px] font-normal text-muted">{t('eligible.confirmText', { x: lead.nom })}</p>
+            <div className="mt-6 flex justify-end gap-2">
+              <button type="button" className="btn-ghost" disabled={busy} onClick={() => setConfirming(false)}>{t('cancel')}</button>
+              <button type="button" className="btn bg-green-600 text-white hover:bg-green-700" disabled={busy} onClick={confirm}>
+                {t('eligible.confirmYes')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   )
 }
