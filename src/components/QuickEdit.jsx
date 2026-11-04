@@ -149,14 +149,15 @@ export const canMarkEligible = (lead) => !CLIENT.eligibleStatuses || CLIENT.elig
 // Only updates the `eligible` field; independent of the status.
 export function EligibleToggle({ lead }) {
   const save = useSave(lead)
-  const [confirming, setConfirming] = useState(false)
+  const { isAdmin } = useLeads()
+  const [confirming, setConfirming] = useState(null) // 'mark' | 'unmark' | null
   const [busy, setBusy] = useState(false)
 
-  const confirm = async () => {
+  const apply = async () => {
     setBusy(true)
-    await save({ eligible: true })
+    await save({ eligible: confirming === 'mark' })
     setBusy(false)
-    setConfirming(false)
+    setConfirming(null)
   }
 
   const check = (
@@ -164,31 +165,32 @@ export function EligibleToggle({ lead }) {
       <path d="M5 12.5l4.5 4.5L19 7.5" />
     </svg>
   )
+  const badge = 'inline-flex h-7 items-center gap-1 whitespace-nowrap rounded-full bg-green-600 px-3 text-[12px] font-semibold text-white shadow-[0_0_0_3px_rgba(22,163,74,0.14)]'
 
+  let control
   if (lead.eligible === true) {
-    return (
-      <span
-        title={t('eligible.locked')}
-        className="inline-flex h-7 items-center gap-1 whitespace-nowrap rounded-full bg-green-600 px-3 text-[12px] font-semibold text-white shadow-[0_0_0_3px_rgba(22,163,74,0.14)]"
-      >
+    // Final for the team. Admins only can remove it, in case it was marked by mistake.
+    control = isAdmin ? (
+      <button type="button" onClick={() => setConfirming('unmark')} title={t('eligible.adminUndo')} className={`${badge} transition-colors hover:bg-green-700`}>
+        {check}
+        {t('eligible.on')}
+      </button>
+    ) : (
+      <span title={t('eligible.locked')} className={badge}>
         {check}
         {t('eligible.on')}
       </span>
     )
-  }
-
-  // Not reached on the phone yet (Nouveau, Pas de réponse, Perdu…): no button, just a quiet dash.
-  if (!canMarkEligible(lead)) {
+  } else if (!canMarkEligible(lead)) {
+    // Not reached on the phone yet (Nouveau, Pas de réponse, Perdu…): no button, just a quiet dash.
     return (
       <span title={t('eligible.notYet')} className="inline-block cursor-default px-2 text-[13px] text-muted/60">
         —
       </span>
     )
-  }
-
-  return (
-    <>
-      <button type="button" onClick={() => setConfirming(true)} title={t('eligible.tooltip')} className="glow-btn">
+  } else {
+    control = (
+      <button type="button" onClick={() => setConfirming('mark')} title={t('eligible.tooltip')} className="glow-btn">
         <span>
           <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="currentColor" aria-hidden="true">
             <path d="M12 2.5l1.9 5.6 5.6 1.9-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.9zM18.5 15l.9 2.6 2.6.9-2.6.9-.9 2.6-.9-2.6-2.6-.9 2.6-.9z" />
@@ -196,21 +198,38 @@ export function EligibleToggle({ lead }) {
           {t('eligible.mark')}
         </span>
       </button>
+    )
+  }
 
+  const unmark = confirming === 'unmark'
+  return (
+    <>
+      {control}
       {confirming && (
-        <div className="fixed inset-0 z-40 grid place-items-center bg-ink/40 px-4" onClick={() => !busy && setConfirming(false)}>
+        <div className="fixed inset-0 z-40 grid place-items-center bg-ink/40 px-4" onClick={() => !busy && setConfirming(null)}>
           <div className="card w-full max-w-md p-6 text-start" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
-            <div className="mb-4 grid h-10 w-10 place-items-center rounded-full bg-green-50 text-green-700">
-              <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z" />
-              </svg>
+            <div className={`mb-4 grid h-10 w-10 place-items-center rounded-full ${unmark ? 'bg-red-50 text-red-600' : 'bg-green-50 text-green-700'}`}>
+              {unmark ? (
+                <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5" />
+                </svg>
+              ) : (
+                <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z" />
+                </svg>
+              )}
             </div>
-            <h2 className="whitespace-normal text-[17px] font-semibold text-ink">{t('eligible.confirmTitle')}</h2>
-            <p className="mt-1.5 whitespace-normal text-[14px] font-normal text-muted">{t('eligible.confirmText', { x: lead.nom })}</p>
+            <h2 className="whitespace-normal text-[17px] font-semibold text-ink">{t(unmark ? 'eligible.undoTitle' : 'eligible.confirmTitle')}</h2>
+            <p className="mt-1.5 whitespace-normal text-[14px] font-normal text-muted">{t(unmark ? 'eligible.undoText' : 'eligible.confirmText', { x: lead.nom })}</p>
             <div className="mt-6 flex justify-end gap-2">
-              <button type="button" className="btn-ghost" disabled={busy} onClick={() => setConfirming(false)}>{t('cancel')}</button>
-              <button type="button" className="btn bg-green-600 text-white hover:bg-green-700" disabled={busy} onClick={confirm}>
-                {t('eligible.confirmYes')}
+              <button type="button" className="btn-ghost" disabled={busy} onClick={() => setConfirming(null)}>{t('cancel')}</button>
+              <button
+                type="button"
+                className={`btn text-white ${unmark ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'}`}
+                disabled={busy}
+                onClick={apply}
+              >
+                {t(unmark ? 'eligible.undoYes' : 'eligible.confirmYes')}
               </button>
             </div>
           </div>

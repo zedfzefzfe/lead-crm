@@ -86,6 +86,18 @@ const UI = {
     en: 'Available after the call (Contacted, Interested, Test ride booked or Sold)',
     ar: 'متاح بعد المكالمة (تم الاتصال، مهتم، تجربة مبرمجة أو تم البيع)',
   },
+  'eligible.adminUndo': {
+    fr: 'Administrateur : cliquez pour retirer l’éligibilité (en cas d’erreur).',
+    en: 'Admin: click to remove eligibility (if it was a mistake).',
+    ar: 'المسؤول: اضغط لإلغاء الأهلية (في حالة الخطأ).',
+  },
+  'eligible.undoTitle': { fr: 'Retirer l’éligibilité ?', en: 'Remove eligibility?', ar: 'إلغاء الأهلية؟' },
+  'eligible.undoText': {
+    fr: '{x} ne sera plus éligible et quittera la page Éligibles. À utiliser seulement en cas d’erreur.',
+    en: '{x} will no longer be eligible and will leave the Eligible page. Use only if it was a mistake.',
+    ar: 'لن يكون {x} مؤهلاً بعد الآن وسيُزال من صفحة المؤهلين. استخدم هذا فقط في حالة الخطأ.',
+  },
+  'eligible.undoYes': { fr: 'Oui, retirer', en: 'Yes, remove', ar: 'نعم، إلغاء' },
   'eligible.confirmTitle': { fr: 'Confirmer l’éligibilité ?', en: 'Confirm eligibility?', ar: 'تأكيد الأهلية؟' },
   'eligible.confirmText': {
     fr: 'Avez-vous confirmé au téléphone que {x} est éligible (crédit ou cash) ? Ce choix est définitif.',
