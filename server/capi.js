@@ -29,6 +29,14 @@ export function normalizePhone(raw) {
 
 const clean = (v) => (typeof v === 'string' ? v.trim() : '')
 
+// Lead name -> first name / last name for Meta matching: trim, lowercase, single spaces.
+// First word = fn, the rest = ln. Arabic names stay as they are (UTF-8). Empty -> {}.
+export function splitName(nom) {
+  const parts = clean(nom).toLowerCase().split(/\s+/).filter(Boolean)
+  if (!parts.length) return {}
+  return parts.length === 1 ? { fn: parts[0] } : { fn: parts[0], ln: parts.slice(1).join(' ') }
+}
+
 // One lead -> one Conversions API event.
 export async function buildEvent(lead) {
   const user_data = {}
@@ -36,6 +44,9 @@ export async function buildEvent(lead) {
   if (phone) user_data.ph = [await sha256(phone)]
   const email = clean(lead.email).toLowerCase()
   if (email) user_data.em = [await sha256(email)]
+  const { fn, ln } = splitName(lead.nom)
+  if (fn) user_data.fn = [await sha256(fn)]
+  if (ln) user_data.ln = [await sha256(ln)]
   if (clean(lead.fb_fbc)) user_data.fbc = clean(lead.fb_fbc) // not hashed (Meta spec)
   if (clean(lead.fb_fbp)) user_data.fbp = clean(lead.fb_fbp) // not hashed (Meta spec)
 
