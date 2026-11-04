@@ -154,3 +154,11 @@ $$;
 -- ---------- 5. Employment status (credit buyers, optional) ---------------
 
 alter table public.leads add column if not exists situation_pro text;
+
+-- ---------- 6. Éligible flag + Meta click identifiers (optional) ----------
+-- Same as supabase/migrations/20261104_bajaj_eligible_fb.sql
+
+alter table public.leads add column if not exists eligible boolean not null default false;
+alter table public.leads add column if not exists fb_fbc text;
+alter table public.leads add column if not exists fb_fbp text;
+alter table public.leads add column if not exists fb_fbclid text;

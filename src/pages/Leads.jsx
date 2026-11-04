@@ -3,7 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { useLeads } from '../lib/leads'
 import { CLIENT, EXTRA_FIELDS, ITEM, STATUTS, SOURCES, SOURCE_LABELS } from '../lib/constants'
 import { formatDate, formatMAD, toISODate } from '../lib/format'
-import { NoteEditor, RelanceInput, StatusSelect } from '../components/QuickEdit'
+import { EligibleToggle, NoteEditor, RelanceInput, StatusSelect } from '../components/QuickEdit'
 import LeadCard from '../components/LeadCard'
 import ContactPref from '../components/ContactPref'
 import PageHeader from '../components/PageHeader'
@@ -136,6 +136,7 @@ export default function Leads() {
                   <td className="whitespace-nowrap px-4 py-3 text-end text-muted">
                     <span className="tabular-nums">{formatDate(l.created_at)}</span>
                     <p className="mt-0.5 text-[12px]">{tv(SOURCE_LABELS[l.source])}</p>
+                    {CLIENT.eligibleButton && <div className="mt-1.5"><EligibleToggle lead={l} /></div>}
                   </td>
                 </tr>
               ))}
