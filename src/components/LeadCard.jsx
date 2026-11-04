@@ -27,8 +27,9 @@ export default function LeadCard({ lead, extra }) {
           </a>
           {lead.ville && <span className="text-[13px] text-muted"> · {lead.ville}</span>}
         </div>
-        <div className="w-40 shrink-0">
+        <div className="flex w-40 shrink-0 flex-col items-end gap-2">
           <StatusSelect lead={lead} />
+          {CLIENT.eligibleButton && <EligibleToggle lead={lead} />}
         </div>
       </div>
       <p className="mt-2 text-[12px] text-muted">
@@ -43,11 +44,6 @@ export default function LeadCard({ lead, extra }) {
       <div className="mt-2.5 rounded-md border border-line bg-cream/60">
         <NoteEditor lead={lead} />
       </div>
-      {CLIENT.eligibleButton && (
-        <div className="mt-2">
-          <EligibleToggle lead={lead} />
-        </div>
-      )}
       {CLIENT.quickRelance && (
         <div className="mt-2 flex items-center gap-2 text-[12px] text-muted">
           <span>{t('col.relance')}</span>

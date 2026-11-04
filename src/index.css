@@ -49,3 +49,61 @@ body {
 @utility eyebrow {
   @apply text-[12px] font-medium text-muted;
 }
+
+/* "Marquer éligible" (Bajaj): pill with a light that travels around its border, plus a soft glow.
+   Uses the client's accent colour, so it matches the theme. Still when the user prefers less motion. */
+@property --glow-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: true;
+}
+
+@keyframes glow-spin {
+  to { --glow-angle: 360deg; }
+}
+
+.glow-btn {
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  border-radius: 9999px;
+  padding: 1.5px;
+  background:
+    conic-gradient(from var(--glow-angle), transparent 0% 50%, #7dd3fc 68%, var(--color-gold) 84%, transparent 100%),
+    var(--color-line);
+  animation: glow-spin 3.2s linear infinite;
+  transition: transform 0.15s ease;
+}
+.glow-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: conic-gradient(from var(--glow-angle), transparent 0% 50%, #7dd3fc 68%, var(--color-gold) 84%, transparent 100%);
+  filter: blur(6px);
+  opacity: 0.55;
+  transition: opacity 0.2s ease;
+}
+.glow-btn > span {
+  display: inline-flex;
+  height: 1.75rem;
+  align-items: center;
+  gap: 0.35rem;
+  border-radius: 9999px;
+  background: #fff;
+  padding: 0 0.7rem;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--color-gold-ink);
+  transition: background-color 0.2s ease;
+}
+.glow-btn:hover::before { opacity: 0.95; }
+.glow-btn:hover > span { background: color-mix(in srgb, var(--color-gold) 6%, #fff); }
+.glow-btn:active { transform: scale(0.97); }
+.glow-btn:focus-visible { outline: 2px solid var(--color-gold); outline-offset: 3px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .glow-btn { animation: none; --glow-angle: 200deg; }
+}

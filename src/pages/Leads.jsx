@@ -100,14 +100,15 @@ export default function Leads() {
             <thead className="border-b border-line bg-sand/50 text-[12px] text-muted [&_th]:text-start">
               <tr>
                 <th className="px-4 py-2.5 font-medium">{t('col.client')}</th>
-                <th className="px-4 py-2.5 font-medium">{tv(ITEM.label)}</th>
+                <th className="px-3 py-2.5 font-medium">{tv(ITEM.label)}</th>
                 <th className="px-3 py-2.5 font-medium">{t('leads.status')}</th>
-                <th className="w-[26%] min-w-[12rem] px-4 py-2.5 font-medium">{t('col.note')}</th>
+                <th className="w-[26%] min-w-[10rem] px-4 py-2.5 font-medium">{t('col.note')}</th>
                 {/* Extra client fields share one column: the first one, the others as a small line below */}
                 {EXTRA_FIELDS.length > 0 && <th className="px-4 py-2.5 font-medium">{tv(EXTRA_FIELDS[0].label)}</th>}
                 {CLIENT.showContactPref && <th className="px-4 py-2.5 font-medium">{t('col.contactPref')}</th>}
                 {CLIENT.quickRelance && <th className="px-4 py-2.5 font-medium">{t('col.relance')}</th>}
-                <th className="px-4 py-2.5 font-medium text-end!">{t('col.received')}</th>
+                <th className="px-3 py-2.5 font-medium text-end!">{t('col.received')}</th>
+                {CLIENT.eligibleButton && <th className="px-2 py-2.5 font-medium text-center!">{t('col.eligible')}</th>}
               </tr>
             </thead>
             <tbody className="divide-y divide-line">
@@ -119,11 +120,11 @@ export default function Leads() {
                     </Link>
                     <p className="mt-0.5 whitespace-nowrap tabular-nums text-muted">{l.telephone}{l.ville ? ` · ${l.ville}` : ''}</p>
                   </td>
-                  <td className="px-4 py-3">
-                    <span className="block max-w-[9rem] text-ink">{l[ITEM.key] || '—'}</span>
+                  <td className="px-3 py-3">
+                    <span className="block min-w-[6.5rem] max-w-[9rem] text-ink">{l[ITEM.key] || '—'}</span>
                     {l.montant_acompte > 0 && <p className="mt-0.5 whitespace-nowrap text-[12px] text-muted">{t('deposit', { x: formatMAD(l.montant_acompte) })}</p>}
                   </td>
-                  <td className="min-w-[12rem] px-3 py-2"><StatusSelect lead={l} /></td>
+                  <td className="min-w-[11rem] px-3 py-2"><StatusSelect lead={l} /></td>
                   <td className="px-2 py-1.5"><NoteEditor lead={l} /></td>
                   {EXTRA_FIELDS.length > 0 && (
                     <td className="whitespace-nowrap px-4 py-3 text-ink">
@@ -133,11 +134,11 @@ export default function Leads() {
                   )}
                   {CLIENT.showContactPref && <td className="px-4 py-2.5"><ContactPref value={l.contact_pref} /></td>}
                   {CLIENT.quickRelance && <td className="px-3 py-2"><RelanceInput lead={l} /></td>}
-                  <td className="whitespace-nowrap px-4 py-3 text-end text-muted">
+                  <td className="whitespace-nowrap px-3 py-3 text-end text-muted">
                     <span className="tabular-nums">{formatDate(l.created_at)}</span>
                     <p className="mt-0.5 text-[12px]">{tv(SOURCE_LABELS[l.source])}</p>
-                    {CLIENT.eligibleButton && <div className="mt-1.5"><EligibleToggle lead={l} /></div>}
                   </td>
+                  {CLIENT.eligibleButton && <td className="px-2 py-3 text-center"><EligibleToggle lead={l} /></td>}
                 </tr>
               ))}
             </tbody>
