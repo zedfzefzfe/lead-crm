@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useLeads } from '../lib/leads'
-import { STATUTS } from '../lib/constants'
+import { CLIENT, STATUTS } from '../lib/constants'
 import { StatusDot } from './StatusBadge'
 import { t, tv } from '../lib/i18n'
 import { toISODate } from '../lib/format'
@@ -140,6 +140,9 @@ export function RelanceInput({ lead }) {
 }
 
 
+// Can the "Marquer éligible" button show for this lead? (always true for clients without eligibleStatuses)
+export const canMarkEligible = (lead) => !CLIENT.eligibleStatuses || CLIENT.eligibleStatuses.includes(lead.statut)
+
 // "Éligible" button (Bajaj): the salesperson confirmed on the phone that the client qualifies
 // for credit or cash. Marking asks for one confirmation and is final: once eligible, the lead
 // stays eligible (it cannot be un-marked, so it never leaves the "Éligibles" page).
@@ -170,6 +173,15 @@ export function EligibleToggle({ lead }) {
       >
         {check}
         {t('eligible.on')}
+      </span>
+    )
+  }
+
+  // Not reached on the phone yet (Nouveau, Pas de réponse, Perdu…): no button, just a quiet dash.
+  if (!canMarkEligible(lead)) {
+    return (
+      <span title={t('eligible.notYet')} className="inline-block cursor-default px-2 text-[13px] text-muted/60">
+        —
       </span>
     )
   }

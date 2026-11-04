@@ -58,6 +58,8 @@ export default {
   showContactPref: false,
   quickRelance: false, // the list shows Paiement instead (date stays on the lead page)
   eligibleButton: true, // "Marquer éligible" toggle in the leads list (credit/cash qualified)
+  // The button only shows once the client was reached on the phone (an eligible lead keeps its badge whatever the status).
+  eligibleStatuses: ['Contacté', 'Intéressé', 'Essai programmé', 'Vendu'],
 
   whatsappMessage: (prenom, item) =>
     `Salam ${prenom} 👋\n` +

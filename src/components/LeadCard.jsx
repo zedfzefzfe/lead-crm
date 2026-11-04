@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { CLIENT, EXTRA_FIELDS, ITEM, SOURCE_LABELS } from '../lib/constants'
 import { formatDate, telLink } from '../lib/format'
-import { EligibleToggle, NoteEditor, RelanceInput, StatusSelect } from './QuickEdit'
+import { canMarkEligible, EligibleToggle, NoteEditor, RelanceInput, StatusSelect } from './QuickEdit'
 import ContactPref from './ContactPref'
 import { t, tv } from '../lib/i18n'
 
@@ -29,7 +29,8 @@ export default function LeadCard({ lead, extra }) {
         </div>
         <div className="flex w-40 shrink-0 flex-col items-end gap-2">
           <StatusSelect lead={lead} />
-          {CLIENT.eligibleButton && <EligibleToggle lead={lead} />}
+          {/* On cards, nothing at all until the client was reached on the phone */}
+          {CLIENT.eligibleButton && (lead.eligible === true || canMarkEligible(lead)) && <EligibleToggle lead={lead} />}
         </div>
       </div>
       <p className="mt-2 text-[12px] text-muted">

@@ -81,6 +81,11 @@ const UI = {
     en: 'Confirmed eligible on the phone. This is final.',
     ar: 'تم تأكيد الأهلية عبر الهاتف. هذا القرار نهائي.',
   },
+  'eligible.notYet': {
+    fr: 'Disponible après l’appel (Contacté, Intéressé, Essai programmé ou Vendu)',
+    en: 'Available after the call (Contacted, Interested, Test ride booked or Sold)',
+    ar: 'متاح بعد المكالمة (تم الاتصال، مهتم، تجربة مبرمجة أو تم البيع)',
+  },
   'eligible.confirmTitle': { fr: 'Confirmer l’éligibilité ?', en: 'Confirm eligibility?', ar: 'تأكيد الأهلية؟' },
   'eligible.confirmText': {
     fr: 'Avez-vous confirmé au téléphone que {x} est éligible (crédit ou cash) ? Ce choix est définitif.',
