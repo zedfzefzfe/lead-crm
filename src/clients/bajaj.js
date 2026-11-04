@@ -56,8 +56,8 @@ export default {
   ],
   showAcompte: true,
   showContactPref: false,
-  quickRelance: false,
-  eligibleButton: true, // "Marquer éligible" toggle in the leads list (credit/cash qualified) // the list shows Paiement instead (date stays on the lead page)
+  quickRelance: false, // the list shows Paiement instead (date stays on the lead page)
+  eligibleButton: true, // "Marquer éligible" toggle in the leads list (credit/cash qualified)
 
   whatsappMessage: (prenom, item) =>
     `Salam ${prenom} 👋\n` +
