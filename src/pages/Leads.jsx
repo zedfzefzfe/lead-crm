@@ -5,6 +5,7 @@ import { CLIENT, EXTRA_FIELDS, ITEM, STATUTS, SOURCES, SOURCE_LABELS } from '../
 import { formatDate, formatMAD, toISODate } from '../lib/format'
 import { NoteEditor, RelanceInput, StatusSelect } from '../components/QuickEdit'
 import LeadCard from '../components/LeadCard'
+import ContactPref from '../components/ContactPref'
 import PageHeader from '../components/PageHeader'
 import { t, tv } from '../lib/i18n'
 
@@ -104,6 +105,7 @@ export default function Leads() {
                 <th className="w-[26%] min-w-[12rem] px-4 py-2.5 font-medium">{t('col.note')}</th>
                 {/* Extra client fields share one column: the first one, the others as a small line below */}
                 {EXTRA_FIELDS.length > 0 && <th className="px-4 py-2.5 font-medium">{tv(EXTRA_FIELDS[0].label)}</th>}
+                {CLIENT.showContactPref && <th className="px-4 py-2.5 font-medium">{t('col.contactPref')}</th>}
                 {CLIENT.quickRelance && <th className="px-4 py-2.5 font-medium">{t('col.relance')}</th>}
                 <th className="px-4 py-2.5 font-medium text-end!">{t('col.received')}</th>
               </tr>
@@ -116,7 +118,6 @@ export default function Leads() {
                       {l.nom}
                     </Link>
                     <p className="mt-0.5 whitespace-nowrap tabular-nums text-muted">{l.telephone}{l.ville ? ` · ${l.ville}` : ''}</p>
-                    {CLIENT.showContactPref && l.contact_pref && <p className="mt-0.5 text-[12px] text-muted">{t('contact', { x: tv(l.contact_pref) })}</p>}
                   </td>
                   <td className="px-4 py-3">
                     <span className="block max-w-[9rem] text-ink">{l[ITEM.key] || '—'}</span>
@@ -130,6 +131,7 @@ export default function Leads() {
                       {EXTRA_FIELDS.slice(1).map((x) => l[x.key] && <p key={x.key} className="mt-0.5 text-[12px] text-muted" title={tv(x.label)}>{tv(l[x.key])}</p>)}
                     </td>
                   )}
+                  {CLIENT.showContactPref && <td className="px-4 py-2.5"><ContactPref value={l.contact_pref} /></td>}
                   {CLIENT.quickRelance && <td className="px-3 py-2"><RelanceInput lead={l} /></td>}
                   <td className="whitespace-nowrap px-4 py-3 text-end text-muted">
                     <span className="tabular-nums">{formatDate(l.created_at)}</span>

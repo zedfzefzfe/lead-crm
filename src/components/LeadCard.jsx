@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { CLIENT, EXTRA_FIELDS, ITEM, SOURCE_LABELS } from '../lib/constants'
 import { formatDate, telLink } from '../lib/format'
 import { NoteEditor, RelanceInput, StatusSelect } from './QuickEdit'
+import ContactPref from './ContactPref'
 import { t, tv } from '../lib/i18n'
 
 // Lead card used on mobile and on the "À relancer" page.
@@ -32,9 +33,13 @@ export default function LeadCard({ lead, extra }) {
       </div>
       <p className="mt-2 text-[12px] text-muted">
         {details.join(' · ')}
-        {lead.contact_pref && ` · ${t('contact', { x: tv(lead.contact_pref) })}`}
       </p>
       {extra && <div className="mt-1 text-[12px]">{extra}</div>}
+      {CLIENT.showContactPref && lead.contact_pref && (
+        <div className="mt-2">
+          <ContactPref value={lead.contact_pref} />
+        </div>
+      )}
       <div className="mt-2.5 rounded-md border border-line bg-cream/60">
         <NoteEditor lead={lead} />
       </div>

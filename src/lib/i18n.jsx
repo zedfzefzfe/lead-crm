@@ -67,6 +67,7 @@ const UI = {
   'leads.emptyAll': { fr: 'Les nouveaux leads apparaîtront ici automatiquement.', en: 'New leads will show up here automatically.', ar: 'سيظهر العملاء الجدد هنا تلقائياً.' },
   'col.client': { fr: 'Client', en: 'Customer', ar: 'العميل' },
   'col.note': { fr: 'Note', en: 'Note', ar: 'ملاحظة' },
+  'col.contactPref': { fr: 'Contact souhaité', en: 'Preferred contact', ar: 'طريقة التواصل المفضلة' },
   'col.relance': { fr: 'Relance', en: 'Follow-up', ar: 'المتابعة' },
   'col.received': { fr: 'Reçu', en: 'Received', ar: 'تاريخ الاستلام' },
   deposit: { fr: 'Acompte {x}', en: 'Deposit {x}', ar: 'عربون {x}' },
