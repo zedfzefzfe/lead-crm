@@ -68,6 +68,7 @@ const UI = {
   'col.client': { fr: 'Client', en: 'Customer', ar: 'العميل' },
   'col.note': { fr: 'Note', en: 'Note', ar: 'ملاحظة' },
   'col.contactPref': { fr: 'Contact souhaité', en: 'Preferred contact', ar: 'طريقة التواصل المفضلة' },
+  'col.eligible': { fr: 'Éligibilité', en: 'Eligibility', ar: 'الأهلية' },
   'eligible.mark': { fr: 'Marquer éligible', en: 'Mark eligible', ar: 'تحديد كمؤهل' },
   'eligible.on': { fr: 'Éligible', en: 'Eligible', ar: 'مؤهل' },
   'eligible.tooltip': {

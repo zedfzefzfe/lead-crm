@@ -166,7 +166,7 @@ export function EligibleToggle({ lead }) {
     return (
       <span
         title={t('eligible.locked')}
-        className="inline-flex h-7 items-center gap-1 whitespace-nowrap rounded-md border border-green-600 bg-green-600 px-2 text-[12px] font-semibold text-white"
+        className="inline-flex h-7 items-center gap-1 whitespace-nowrap rounded-full bg-green-600 px-3 text-[12px] font-semibold text-white shadow-[0_0_0_3px_rgba(22,163,74,0.14)]"
       >
         {check}
         {t('eligible.on')}
@@ -176,14 +176,13 @@ export function EligibleToggle({ lead }) {
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setConfirming(true)}
-        title={t('eligible.tooltip')}
-        className="inline-flex h-7 items-center gap-1 whitespace-nowrap rounded-md border border-green-600 bg-white px-2 text-[12px] font-semibold text-green-700 transition-colors hover:bg-green-50"
-      >
-        {check}
-        {t('eligible.mark')}
+      <button type="button" onClick={() => setConfirming(true)} title={t('eligible.tooltip')} className="glow-btn">
+        <span>
+          <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="currentColor" aria-hidden="true">
+            <path d="M12 2.5l1.9 5.6 5.6 1.9-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.9zM18.5 15l.9 2.6 2.6.9-2.6.9-.9 2.6-.9-2.6-2.6-.9 2.6-.9z" />
+          </svg>
+          {t('eligible.mark')}
+        </span>
       </button>
 
       {confirming && (
