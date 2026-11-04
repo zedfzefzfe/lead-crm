@@ -101,7 +101,7 @@ export default function Leads() {
                 <th className="px-4 py-2.5 font-medium">{t('col.client')}</th>
                 <th className="px-4 py-2.5 font-medium">{tv(ITEM.label)}</th>
                 <th className="px-3 py-2.5 font-medium">{t('leads.status')}</th>
-                <th className="w-[30%] min-w-[14rem] px-4 py-2.5 font-medium">{t('col.note')}</th>
+                <th className="w-[26%] min-w-[12rem] px-4 py-2.5 font-medium">{t('col.note')}</th>
                 {/* Extra client fields share one column: the first one, the others as a small line below */}
                 {EXTRA_FIELDS.length > 0 && <th className="px-4 py-2.5 font-medium">{tv(EXTRA_FIELDS[0].label)}</th>}
                 {CLIENT.quickRelance && <th className="px-4 py-2.5 font-medium">{t('col.relance')}</th>}
@@ -112,17 +112,17 @@ export default function Leads() {
               {filtered.map((l) => (
                 <tr key={l.id} className="align-top transition-colors hover:bg-sand/30">
                   <td className="px-4 py-3">
-                    <Link to={`/leads/${l.id}`} className="whitespace-nowrap font-medium text-ink hover:text-gold">
+                    <Link to={`/leads/${l.id}`} className="whitespace-nowrap font-medium text-ink hover:text-gold-ink">
                       {l.nom}
                     </Link>
                     <p className="mt-0.5 whitespace-nowrap tabular-nums text-muted">{l.telephone}{l.ville ? ` · ${l.ville}` : ''}</p>
                     {CLIENT.showContactPref && l.contact_pref && <p className="mt-0.5 text-[12px] text-muted">{t('contact', { x: tv(l.contact_pref) })}</p>}
                   </td>
                   <td className="px-4 py-3">
-                    <span className="whitespace-nowrap text-ink">{l[ITEM.key] || '—'}</span>
+                    <span className="block max-w-[9rem] text-ink">{l[ITEM.key] || '—'}</span>
                     {l.montant_acompte > 0 && <p className="mt-0.5 whitespace-nowrap text-[12px] text-muted">{t('deposit', { x: formatMAD(l.montant_acompte) })}</p>}
                   </td>
-                  <td className="min-w-[12.5rem] px-3 py-2"><StatusSelect lead={l} /></td>
+                  <td className="min-w-[12rem] px-3 py-2"><StatusSelect lead={l} /></td>
                   <td className="px-2 py-1.5"><NoteEditor lead={l} /></td>
                   {EXTRA_FIELDS.length > 0 && (
                     <td className="whitespace-nowrap px-4 py-3 text-ink">

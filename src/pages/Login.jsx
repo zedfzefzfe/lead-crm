@@ -27,9 +27,9 @@ export default function Login() {
       </div>
       <form onSubmit={submit} className="card w-full max-w-sm p-7">
         {CLIENT.brand.logo ? (
-          <img src={CLIENT.brand.logo} alt={CLIENT.brand.name} className="h-auto w-full" />
+          <img src={CLIENT.brand.logo} alt={CLIENT.brand.name} className="h-auto w-auto max-h-28 max-w-full" />
         ) : (
-          <span className="grid h-10 w-10 place-items-center rounded-lg bg-gold text-[17px] font-bold text-white">
+          <span className="grid h-10 w-10 place-items-center rounded-lg bg-gold text-[17px] font-bold text-on-gold">
             {CLIENT.brand.name[0]}
           </span>
         )}

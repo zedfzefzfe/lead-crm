@@ -86,7 +86,7 @@ export default function Layout({ user, children }) {
             to={n.to}
             end={n.to === '/'}
             className={({ isActive }) =>
-              `relative flex flex-col items-center gap-1 py-2 text-[11px] font-medium ${isActive ? 'text-gold' : 'text-muted'}`
+              `relative flex flex-col items-center gap-1 py-2 text-[11px] font-medium ${isActive ? 'text-gold-ink' : 'text-muted'}`
             }
           >
             <Icon d={n.icon} className="h-5 w-5" />
@@ -108,12 +108,12 @@ export default function Layout({ user, children }) {
 // Client logo if there is one (e.g. Bajaj), otherwise a letter mark + name.
 export function Brand({ size = 'md' }) {
   if (CLIENT.brand.logo) {
-    const cls = size === 'sm' ? 'h-10 w-auto' : 'h-auto w-full'
+    const cls = size === 'sm' ? 'h-10 w-auto' : 'h-auto w-auto max-h-24 max-w-full'
     return <img src={CLIENT.brand.logo} alt={CLIENT.brand.name} className={`${cls} object-contain`} />
   }
   return (
     <div className="flex items-center gap-2.5">
-      <span className={`grid place-items-center rounded-md bg-gold font-bold text-white ${size === 'lg' ? 'h-10 w-10 text-[17px]' : 'h-7 w-7 text-[13px]'}`}>
+      <span className={`grid place-items-center rounded-md bg-gold font-bold text-on-gold ${size === 'lg' ? 'h-10 w-10 text-[17px]' : 'h-7 w-7 text-[13px]'}`}>
         {CLIENT.brand.name[0]}
       </span>
       <div className="leading-tight">
@@ -126,6 +126,6 @@ export function Brand({ size = 'md' }) {
 
 function Count({ n }) {
   return (
-    <span className="min-w-5 rounded-full bg-gold px-1.5 py-px text-center text-[11px] font-semibold leading-4 text-white">{n}</span>
+    <span className="min-w-5 rounded-full bg-gold px-1.5 py-px text-center text-[11px] font-semibold leading-4 text-on-gold">{n}</span>
   )
 }

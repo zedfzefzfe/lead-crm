@@ -15,7 +15,7 @@ export default function LeadDetail() {
   const lead = leads.find((l) => l.id === id)
 
   if (loading) return <p className="text-muted">{t('loading')}</p>
-  if (!lead) return <p className="text-muted">{t('lead.notFound')} <Link className="text-gold-dark" to="/leads">{t('lead.back')}</Link></p>
+  if (!lead) return <p className="text-muted">{t('lead.notFound')} <Link className="text-gold-ink" to="/leads">{t('lead.back')}</Link></p>
 
   // Every change is saved immediately; Realtime pushes it to the rest of the team.
   const save = async (changes) => {

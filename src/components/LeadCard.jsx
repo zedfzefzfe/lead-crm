@@ -18,10 +18,10 @@ export default function LeadCard({ lead, extra }) {
     <div className="card p-3.5">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <Link to={`/leads/${lead.id}`} className="block truncate text-[15px] font-medium text-ink hover:text-gold">
+          <Link to={`/leads/${lead.id}`} className="block truncate text-[15px] font-medium text-ink hover:text-gold-ink">
             {lead.nom}
           </Link>
-          <a href={telLink(lead.telephone)} className="text-[13px] tabular-nums text-gold">
+          <a href={telLink(lead.telephone)} className="text-[13px] tabular-nums text-gold-ink">
             {lead.telephone}
           </a>
           {lead.ville && <span className="text-[13px] text-muted"> · {lead.ville}</span>}

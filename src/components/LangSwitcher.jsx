@@ -41,7 +41,7 @@ export default function LangSwitcher() {
                   setLang(l.code)
                 }}
                 className={`flex w-full items-center justify-between px-3 py-2 text-start text-[14px] hover:bg-sand ${
-                  l.code === lang ? 'font-semibold text-gold' : 'text-ink'
+                  l.code === lang ? 'font-semibold text-gold-ink' : 'text-ink'
                 }`}
               >
                 <span>{l.label}</span>

@@ -1,7 +1,24 @@
 // Crea'rt Workshops — creative workshops (candles, resin, soap, perfume…).
 export default {
-  brand: { name: "Crea'rt", tagline: 'Workshops · CRM', title: "Crea'rt CRM" },
-  theme: {}, // keeps the default cream / soft gold colours from index.css
+  brand: {
+    name: "Crea'rt",
+    tagline: 'Workshops · CRM',
+    title: "Crea'rt CRM",
+    logo: '/clients/creart-logo.png', // sidebar, login, phone header
+    favicon: '/clients/creart-favicon.png', // browser tab icon
+  },
+  // Same look as Bajaj (neutral greys), with the Crea'rt logo colours: orange #FD924E + black.
+  theme: {
+    '--color-cream': '#f6f6f5',
+    '--color-sand': '#f0efed',
+    '--color-line': '#e5e3e0',
+    '--color-ink': '#141414',
+    '--color-muted': '#6b6965',
+    '--color-gold': '#fd924e', // logo orange (buttons, badges, charts)
+    '--color-gold-dark': '#f57f33', // hover
+    '--color-on-gold': '#101010', // logo black on orange (readable; white on this orange is not)
+    '--color-gold-ink': '#b85513', // deeper orange for links and phone numbers on white
+  },
 
   statuts: ['Nouveau', 'Contacté', 'Pas de réponse', 'Intéressée', 'Acompte payé', 'Confirmée', 'Perdue'],
   // Colour of the small dot shown next to each status.

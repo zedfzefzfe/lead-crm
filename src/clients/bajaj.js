@@ -16,6 +16,8 @@ export default {
     '--color-muted': '#6b7280',
     '--color-gold': '#0061b0', // Bajaj logo blue
     '--color-gold-dark': '#004e8f',
+    '--color-on-gold': '#ffffff',
+    '--color-gold-ink': '#0061b0',
   },
 
   statuts: ['Nouveau', 'Contacté', 'Pas de réponse', 'Intéressé', 'Essai programmé', 'Vendu', 'Perdu'],

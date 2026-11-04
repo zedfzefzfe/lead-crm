@@ -130,7 +130,7 @@ export function RelanceInput({ lead }) {
           type="button"
           title={t('relance.tomorrowTitle')}
           onClick={() => save({ prochaine_relance: tomorrow })}
-          className="h-8 whitespace-nowrap rounded-md px-2 text-[13px] font-medium text-gold hover:bg-sand"
+          className="h-8 whitespace-nowrap rounded-md px-2 text-[13px] font-medium text-gold-ink hover:bg-sand"
         >
           {t('relance.tomorrow')}
         </button>

@@ -48,7 +48,7 @@ export default function Relances() {
             lead={l}
             extra={
               l.prochaine_relance && (
-                <span className={`font-medium ${l.prochaine_relance < today ? 'text-red-600' : 'text-gold'}`}>
+                <span className={`font-medium ${l.prochaine_relance < today ? 'text-red-600' : 'text-gold-ink'}`}>
                   {l.prochaine_relance === today ? t('rel.today') : t('rel.planned', { x: formatDate(l.prochaine_relance) })}
                   {l.prochaine_relance < today && t('rel.late')}
                 </span>

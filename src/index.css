@@ -11,6 +11,8 @@
   --color-muted: #78716c;      /* secondary text */
   --color-gold: #a17a35;       /* accent (buttons, links, focus) */
   --color-gold-dark: #85632a;  /* accent hover */
+  --color-on-gold: #ffffff;    /* text on accent fills (buttons, badges) */
+  --color-gold-ink: #85632a;   /* accent used as text (links, phone numbers) */
 }
 
 body {
@@ -37,7 +39,7 @@ body {
 }
 
 @utility btn-gold {
-  @apply btn bg-gold text-white hover:bg-gold-dark shadow-[0_1px_2px_rgba(16,24,40,0.08)];
+  @apply btn bg-gold text-on-gold hover:bg-gold-dark shadow-[0_1px_2px_rgba(16,24,40,0.08)];
 }
 
 @utility btn-ghost {

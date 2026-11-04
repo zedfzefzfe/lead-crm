@@ -94,7 +94,7 @@ export default function Admin() {
               <label className={`flex cursor-pointer items-center gap-3 px-4 py-3 transition-colors ${selected.has(l.id) ? 'bg-red-50/60' : 'hover:bg-sand/30'}`}>
                 <input type="checkbox" className="h-4 w-4 shrink-0 accent-[var(--color-gold)]" checked={selected.has(l.id)} onChange={() => toggle(l.id)} />
                 <div className="min-w-0 flex-1">
-                  <Link to={`/leads/${l.id}`} className="font-medium text-ink hover:text-gold" onClick={(e) => e.stopPropagation()}>
+                  <Link to={`/leads/${l.id}`} className="font-medium text-ink hover:text-gold-ink" onClick={(e) => e.stopPropagation()}>
                     {l.nom}
                   </Link>
                   <p className="truncate text-[12px] text-muted">
