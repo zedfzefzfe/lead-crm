@@ -11,6 +11,8 @@ import LeadDetail from './pages/LeadDetail'
 import Relances from './pages/Relances'
 import AddLead from './pages/AddLead'
 import Admin from './pages/Admin'
+import Eligibles from './pages/Eligibles'
+import { CLIENT } from './lib/constants'
 
 export default function App() {
   const [session, setSession] = useState(undefined)
@@ -41,6 +43,7 @@ export default function App() {
           <Route path="/leads" element={<Leads />} />
           <Route path="/leads/:id" element={<LeadDetail />} />
           <Route path="/relances" element={<Relances />} />
+          {CLIENT.eligibleButton && <Route path="/eligibles" element={<Eligibles />} />}
           <Route path="/ajouter" element={<AddLead />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="*" element={<Navigate to="/" replace />} />

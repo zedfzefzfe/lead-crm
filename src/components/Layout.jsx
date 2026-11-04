@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase'
 import { useLeads } from '../lib/leads'
 import { CLIENT } from '../lib/constants'
 import { useRelances } from '../pages/Relances'
+import { useEligibles } from '../pages/Eligibles'
 import Toasts from './Toasts'
 import { t } from '../lib/i18n'
 
@@ -10,6 +11,8 @@ const NAV = [
   { to: '/', label: 'nav.dashboard', short: 'nav.dashboard.short', icon: 'M4 5h6v6H4zM14 5h6v4h-6zM14 13h6v6h-6zM4 15h6v4H4z' },
   { to: '/leads', label: 'nav.leads', short: 'nav.leads', icon: 'M16 19v-1a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v1M9 10a3 3 0 1 0 0-6 3 3 0 0 0 0 6M22 19v-1a4 4 0 0 0-3-3.9M16 4.1a3 3 0 0 1 0 5.8' },
   { to: '/relances', label: 'nav.relances', short: 'nav.relances.short', icon: 'M12 8v4l3 2M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0' },
+  // Bajaj only (CLIENT.eligibleButton): leads confirmed eligible on the phone.
+  { to: '/eligibles', label: 'nav.eligible', short: 'nav.eligible', icon: 'M22 11.1V12a10 10 0 1 1-5.9-9.1M22 4 12 14l-3-3', eligibleOnly: true },
   { to: '/ajouter', label: 'nav.add', short: 'nav.add.short', icon: 'M12 5v14M5 12h14' },
 ]
 
@@ -26,8 +29,10 @@ function Icon({ d, className = 'h-[18px] w-[18px]' }) {
 
 export default function Layout({ user, children }) {
   const { toasts, isAdmin } = useLeads()
-  const nav = isAdmin ? [...NAV, ADMIN_NAV] : NAV
+  const base = NAV.filter((n) => !n.eligibleOnly || CLIENT.eligibleButton)
+  const nav = isAdmin ? [...base, ADMIN_NAV] : base
   const relanceCount = useRelances().length
+  const eligibleCount = useEligibles().length
   const logout = () => supabase.auth.signOut()
 
   return (
@@ -52,6 +57,7 @@ export default function Layout({ user, children }) {
               <Icon d={n.icon} />
               <span className="flex-1">{t(n.label)}</span>
               {n.to === '/relances' && relanceCount > 0 && <Count n={relanceCount} />}
+              {n.to === '/eligibles' && eligibleCount > 0 && <Count n={eligibleCount} />}
             </NavLink>
           ))}
         </nav>
@@ -79,7 +85,9 @@ export default function Layout({ user, children }) {
       </main>
 
       {/* Mobile bottom nav */}
-      <nav className={`fixed inset-x-0 bottom-0 z-20 grid ${isAdmin ? 'grid-cols-5' : 'grid-cols-4'} border-t border-line bg-white pb-[env(safe-area-inset-bottom)] md:hidden`}>
+      <nav
+        style={{ gridTemplateColumns: `repeat(${nav.length}, minmax(0, 1fr))` }}
+        className={`fixed inset-x-0 bottom-0 z-20 grid border-t border-line bg-white pb-[env(safe-area-inset-bottom)] md:hidden`}>
         {nav.map((n) => (
           <NavLink
             key={n.to}
