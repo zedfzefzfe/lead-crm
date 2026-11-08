@@ -5,6 +5,7 @@ import { CLIENT, EXTRA_FIELDS, ITEM, STATUTS, SOURCES, SOURCE_LABELS } from '../
 import { formatDate, formatMAD, toISODate } from '../lib/format'
 import { EligibleToggle, NoteEditor, RelanceInput, StatusSelect } from '../components/QuickEdit'
 import LeadCard from '../components/LeadCard'
+import DeleteLeadButton from '../components/DeleteLeadButton'
 import ContactPref from '../components/ContactPref'
 import PageHeader from '../components/PageHeader'
 import { t, tv } from '../lib/i18n'
@@ -109,13 +110,14 @@ export default function Leads() {
                 {CLIENT.quickRelance && <th className="px-4 py-2.5 font-medium">{t('col.relance')}</th>}
                 <th className="px-3 py-2.5 font-medium text-end!">{t('col.received')}</th>
                 {CLIENT.eligibleButton && <th className="px-2 py-2.5 font-medium text-center!">{t('col.eligible')}</th>}
+                {CLIENT.passwordDelete && <th className="w-10 px-1 py-2.5"><span className="sr-only">{t('del.button')}</span></th>}
               </tr>
             </thead>
             <tbody className="divide-y divide-line">
               {filtered.map((l) => (
                 <tr key={l.id} className="align-top transition-colors hover:bg-sand/30">
                   <td className="px-4 py-3">
-                    <Link to={`/leads/${l.id}`} className="whitespace-nowrap font-medium text-ink hover:text-gold-ink">
+                    <Link to={`/leads/${l.id}`} title={l.nom} className="block max-w-[16rem] truncate font-medium text-ink hover:text-gold-ink">
                       {l.nom}
                     </Link>
                     <p className="mt-0.5 whitespace-nowrap tabular-nums text-muted">{l.telephone}{l.ville ? ` · ${l.ville}` : ''}</p>
@@ -139,6 +141,7 @@ export default function Leads() {
                     <p className="mt-0.5 text-[12px]">{tv(SOURCE_LABELS[l.source])}</p>
                   </td>
                   {CLIENT.eligibleButton && <td className="px-2 py-3 text-center"><EligibleToggle lead={l} /></td>}
+                  {CLIENT.passwordDelete && <td className="px-1 py-2.5 text-center"><DeleteLeadButton lead={l} /></td>}
                 </tr>
               ))}
             </tbody>

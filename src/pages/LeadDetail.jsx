@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useLeads } from '../lib/leads'
 import { CLIENT, EXTRA_FIELDS, ITEM, STATUTS, RAISONS, SOURCE_LABELS, FIELD_LABELS } from '../lib/constants'
 import { formatDate, formatDateTime, formatMAD, telLink, whatsappLink } from '../lib/format'
 import StatusBadge from '../components/StatusBadge'
+import DeleteLeadButton from '../components/DeleteLeadButton'
 import { t, tv } from '../lib/i18n'
 
 const HIST_LABELS = { statut: 'hist.status', raison: 'hist.reason', montant_acompte: 'hist.deposit', notes: 'hist.notes' }
@@ -12,6 +13,7 @@ const HIST_LABELS = { statut: 'hist.status', raison: 'hist.reason', montant_acom
 export default function LeadDetail() {
   const { id } = useParams()
   const { leads, loading, updateLead, notify } = useLeads()
+  const navigate = useNavigate()
   const lead = leads.find((l) => l.id === id)
 
   if (loading) return <p className="text-muted">{t('loading')}</p>
@@ -65,6 +67,7 @@ export default function LeadDetail() {
             <svg viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Z" /></svg>
             WhatsApp
           </a>
+          {CLIENT.passwordDelete && <DeleteLeadButton lead={lead} variant="button" onDeleted={() => navigate('/leads', { replace: true })} />}
         </div>
       </div>
 
