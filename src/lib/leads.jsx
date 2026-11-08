@@ -96,6 +96,19 @@ export function LeadsProvider({ children }) {
     return gone.size
   }, [])
 
+  // Any logged-in user, with the delete password (checked by the database, supabase/delete-password.sql).
+  const deleteLeadsWithPassword = useCallback(async (ids, password) => {
+    const { data, error } = await supabase.rpc('delete_leads_with_password', { p_password: password, p_ids: ids })
+    if (error) {
+      const err = new Error(error.message)
+      if (/wrong_password/.test(error.message)) err.code = 'wrong_password'
+      else if (error.code === 'PGRST202' || /delete_leads_with_password/.test(error.message)) err.code = 'not_configured'
+      throw err
+    }
+    setLeads((list) => list.filter((l) => !ids.includes(l.id)))
+    return data
+  }, [])
+
   const addLead = useCallback(async (lead) => {
     // Meta identifiers are stored when present; when absent they are not sent (the column stays null).
     const row = { ...lead }
@@ -110,7 +123,7 @@ export function LeadsProvider({ children }) {
   }, [])
 
   return (
-    <LeadsContext.Provider value={{ leads, loading, error, updateLead, addLead, deleteLeads, isAdmin, toasts, notify }}>
+    <LeadsContext.Provider value={{ leads, loading, error, updateLead, addLead, deleteLeads, deleteLeadsWithPassword, isAdmin, toasts, notify }}>
       {children}
     </LeadsContext.Provider>
   )

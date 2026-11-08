@@ -45,6 +45,7 @@ export default {
   showAcompte: true,
   showContactPref: true, // "Contact souhaité" column, filled by the landing page pop-up
   quickRelance: false, // no follow-up date column in the list (it stays on the lead page)
+  passwordDelete: true, // trash button on each lead, asks for the delete password (supabase/delete-password.sql)
 
   whatsappMessage: (prenom, item) =>
     `Salam ${prenom} 😊\n` +
