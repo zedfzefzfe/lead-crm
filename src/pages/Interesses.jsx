@@ -1,6 +1,7 @@
 import { useLeads } from '../lib/leads'
 import { CLIENT } from '../lib/constants'
 import LeadCard from '../components/LeadCard'
+import AtelierChips, { useAtelierFilter } from '../components/AtelierChips'
 import PageHeader from '../components/PageHeader'
 import { t } from '../lib/i18n'
 
@@ -17,11 +18,15 @@ export function useInteresses() {
 
 export default function Interesses() {
   const { loading } = useLeads()
-  const list = useInteresses()
+  const all = useInteresses()
+  const atelier = useAtelierFilter(all)
+  const list = atelier.filtered
 
   return (
     <div>
       <PageHeader title={t('int.title')} subtitle={t('int.subtitle', { x: list.length === 1 ? t('rel.lead') : t('rel.leads', { x: list.length }) })} />
+
+      <AtelierChips list={all} filter={atelier} />
 
       {loading && <p className="text-muted">{t('loading')}</p>}
       {!loading && list.length === 0 && (

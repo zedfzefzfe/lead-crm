@@ -2,6 +2,7 @@ import { useLeads } from '../lib/leads'
 import { A_RELANCER, CLIENT } from '../lib/constants'
 import { formatDate, todayISO } from '../lib/format'
 import LeadCard from '../components/LeadCard'
+import AtelierChips, { useAtelierFilter } from '../components/AtelierChips'
 import { CallAttempts } from '../components/CallAttempts'
 import PageHeader from '../components/PageHeader'
 import { t } from '../lib/i18n'
@@ -31,7 +32,9 @@ export function useRelances() {
 
 export default function Relances() {
   const { loading } = useLeads()
-  const list = useRelances()
+  const all = useRelances()
+  const atelier = useAtelierFilter(all)
+  const list = atelier.filtered
   const today = todayISO()
 
   return (
@@ -40,6 +43,8 @@ export default function Relances() {
         title={t('rel.title')}
         subtitle={t(CLIENT.relance ? 'rel.subtitleCalls' : 'rel.subtitle', { x: list.length === 1 ? t('rel.lead') : t('rel.leads', { x: list.length }), y: CLIENT.relance?.maxAttempts })}
       />
+
+      <AtelierChips list={all} filter={atelier} />
 
       {loading && <p className="text-muted">{t('loading')}</p>}
       {!loading && list.length === 0 && (
