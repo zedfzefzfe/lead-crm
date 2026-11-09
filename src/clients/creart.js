@@ -40,7 +40,11 @@ export default {
   sourceLabels: { landing: 'Landing page', whatsapp: 'WhatsApp', instagram: 'Instagram', autre: 'Autre' },
 
   // What the lead is interested in (column name in the leads table).
-  item: { key: 'atelier', label: 'Atelier', plural: 'ateliers', default: 'Bougies Casa 31 Oct', options: [] },
+  item: { key: 'atelier', label: 'Atelier', plural: 'ateliers', default: 'Bougies Casa 15 Nov', options: ['Bougies Casa 15 Nov', 'Bougies Tanger 21 Nov'] },
+  // Focus: the CRM shows only these ateliers (each = words that must all be in the atelier name).
+  // Other leads are hidden, never deleted; "Afficher tous les ateliers" on the Leads page shows them.
+  focusAteliers: [['casa', '15 nov'], ['tanger', '21 nov']],
+  focusLabel: 'Casa 15 Nov · Tanger 21 Nov',
   extraFields: [], // more dropdown fields, e.g. payment method
   showAcompte: true,
   showContactPref: true, // "Contact souhaité" column, filled by the landing page pop-up

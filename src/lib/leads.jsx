@@ -1,7 +1,7 @@
-import { createContext, useCallback, useContext, useEffect, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { supabase } from './supabase'
 import { t } from './i18n'
-import { CLIENT } from './constants'
+import { CLIENT, ITEM } from './constants'
 
 // Holds every lead in memory and keeps the list in sync with Supabase Realtime,
 // so all pages update instantly for everyone who is logged in.
@@ -24,8 +24,25 @@ async function fetchAllLeads() {
   }
 }
 
+// Focus on some ateliers (CLIENT.focusAteliers): other leads are hidden, not deleted.
+const plain = (s) => String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ')
+export const inFocus = (lead) =>
+  !CLIENT.focusAteliers || CLIENT.focusAteliers.some((words) => words.every((w) => plain(lead[ITEM.key]).includes(w)))
+const SHOW_ALL_KEY = 'crm-show-all-ateliers'
+
 export function LeadsProvider({ children }) {
-  const [leads, setLeads] = useState([])
+  const [allLeads, setLeads] = useState([])
+  const [showAll, setShowAllState] = useState(() => {
+    try { return localStorage.getItem(SHOW_ALL_KEY) === '1' } catch { return false }
+  })
+  const setShowAll = useCallback((v) => {
+    setShowAllState(v)
+    try { localStorage.setItem(SHOW_ALL_KEY, v ? '1' : '0') } catch { /* private mode */ }
+  }, [])
+  const leads = useMemo(() => (showAll || !CLIENT.focusAteliers ? allLeads : allLeads.filter(inFocus)), [allLeads, showAll])
+  const hiddenCount = allLeads.length - leads.length
+  const showAllRef = useRef(showAll)
+  showAllRef.current = showAll
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [toasts, setToasts] = useState([])
@@ -63,7 +80,7 @@ export function LeadsProvider({ children }) {
           setLeads((list) =>
             list.some((l) => l.id === payload.new.id) ? list : [payload.new, ...list]
           )
-          notify(t('newLead', { x: payload.new.nom }))
+          if (showAllRef.current || inFocus(payload.new)) notify(t('newLead', { x: payload.new.nom }))
         } else if (payload.eventType === 'UPDATE') {
           setLeads((list) => list.map((l) => (l.id === payload.new.id ? payload.new : l)))
         } else if (payload.eventType === 'DELETE') {
@@ -133,7 +150,7 @@ export function LeadsProvider({ children }) {
   }, [])
 
   return (
-    <LeadsContext.Provider value={{ leads, loading, error, updateLead, addLead, deleteLeads, deleteLeadsWithPassword, registerCallAttempt, isAdmin, toasts, notify }}>
+    <LeadsContext.Provider value={{ leads, loading, error, updateLead, addLead, deleteLeads, deleteLeadsWithPassword, registerCallAttempt, isAdmin, showAll, setShowAll, hiddenCount, toasts, notify }}>
       {children}
     </LeadsContext.Provider>
   )

@@ -14,7 +14,7 @@ import { t, tv } from '../lib/i18n'
 const FILTERS = ['q', 'statut', 'atelier', 'source', 'du', 'au']
 
 export default function Leads() {
-  const { leads, loading, error } = useLeads()
+  const { leads, loading, error, showAll, setShowAll, hiddenCount } = useLeads()
   // Filters live in the URL so they survive a refresh and can be shared.
   const [params, setParams] = useSearchParams()
   const f = Object.fromEntries(FILTERS.map((k) => [k, params.get(k) || '']))
@@ -55,6 +55,18 @@ export default function Leads() {
           <span className="text-[16px] leading-none">+</span> {t('nav.add')}
         </Link>
       </PageHeader>
+
+      {/* Focus on the current ateliers (Crea'rt): other leads are hidden, not deleted */}
+      {CLIENT.focusAteliers && (
+        <div className={`mb-3 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-md border px-3 py-2 text-[13px] ${showAll ? 'border-line bg-white text-muted' : 'border-gold/40 bg-gold/5 text-ink'}`}>
+          <span>
+            {showAll ? t('focus.all') : <>{t('focus.on')} <strong className="font-semibold">{CLIENT.focusLabel}</strong>{hiddenCount > 0 && <span className="text-muted"> · {t('focus.hidden', { x: hiddenCount })}</span>}</>}
+          </span>
+          <button type="button" onClick={() => setShowAll(!showAll)} className="font-medium text-gold-ink underline-offset-2 hover:underline">
+            {showAll ? t('focus.back') : t('focus.showAll')}
+          </button>
+        </div>
+      )}
 
       {/* Filters */}
       <div className="grid grid-cols-3 items-center gap-2 md:flex md:flex-wrap">
