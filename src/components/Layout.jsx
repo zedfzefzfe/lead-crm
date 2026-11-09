@@ -4,6 +4,7 @@ import { useLeads } from '../lib/leads'
 import { CLIENT } from '../lib/constants'
 import { useRelances } from '../pages/Relances'
 import { useEligibles } from '../pages/Eligibles'
+import { useInteresses } from '../pages/Interesses'
 import Toasts from './Toasts'
 import { t } from '../lib/i18n'
 
@@ -11,6 +12,8 @@ const NAV = [
   { to: '/', label: 'nav.dashboard', short: 'nav.dashboard.short', icon: 'M4 5h6v6H4zM14 5h6v4h-6zM14 13h6v6h-6zM4 15h6v4H4z' },
   { to: '/leads', label: 'nav.leads', short: 'nav.leads', icon: 'M16 19v-1a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v1M9 10a3 3 0 1 0 0-6 3 3 0 0 0 0 6M22 19v-1a4 4 0 0 0-3-3.9M16 4.1a3 3 0 0 1 0 5.8' },
   { to: '/relances', label: 'nav.relances', short: 'nav.relances.short', icon: 'M12 8v4l3 2M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0' },
+  // Clients with CLIENT.interestedPage (Crea'rt): leads with the "interested" status.
+  { to: '/interesses', label: 'nav.interested', short: 'nav.interested.short', icon: 'M12 20.5s-7.5-4.6-7.5-10.1A4.4 4.4 0 0 1 12 7.6a4.4 4.4 0 0 1 7.5 2.8c0 5.5-7.5 10.1-7.5 10.1Z', interestedOnly: true },
   // Bajaj only (CLIENT.eligibleButton): leads confirmed eligible on the phone.
   { to: '/eligibles', label: 'nav.eligible', short: 'nav.eligible', icon: 'M22 11.1V12a10 10 0 1 1-5.9-9.1M22 4 12 14l-3-3', eligibleOnly: true },
   { to: '/ajouter', label: 'nav.add', short: 'nav.add.short', icon: 'M12 5v14M5 12h14' },
@@ -29,10 +32,11 @@ function Icon({ d, className = 'h-[18px] w-[18px]' }) {
 
 export default function Layout({ user, children }) {
   const { toasts, isAdmin } = useLeads()
-  const base = NAV.filter((n) => !n.eligibleOnly || CLIENT.eligibleButton)
+  const base = NAV.filter((n) => (!n.eligibleOnly || CLIENT.eligibleButton) && (!n.interestedOnly || CLIENT.interestedPage))
   const nav = isAdmin ? [...base, ADMIN_NAV] : base
   const relanceCount = useRelances().length
   const eligibleCount = useEligibles().length
+  const interestedCount = useInteresses().length
   const logout = () => supabase.auth.signOut()
 
   return (
@@ -58,6 +62,7 @@ export default function Layout({ user, children }) {
               <span className="flex-1">{t(n.label)}</span>
               {n.to === '/relances' && relanceCount > 0 && <Count n={relanceCount} />}
               {n.to === '/eligibles' && eligibleCount > 0 && <Count n={eligibleCount} />}
+              {n.to === '/interesses' && interestedCount > 0 && <Count n={interestedCount} />}
             </NavLink>
           ))}
         </nav>
@@ -102,6 +107,11 @@ export default function Layout({ user, children }) {
             {n.to === '/relances' && relanceCount > 0 && (
               <span className="absolute start-1/2 top-1 ms-2.5">
                 <Count n={relanceCount} />
+              </span>
+            )}
+            {n.to === '/interesses' && interestedCount > 0 && (
+              <span className="absolute start-1/2 top-1 ms-2.5">
+                <Count n={interestedCount} />
               </span>
             )}
           </NavLink>

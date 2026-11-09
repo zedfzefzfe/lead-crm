@@ -12,6 +12,7 @@ import Relances from './pages/Relances'
 import AddLead from './pages/AddLead'
 import Admin from './pages/Admin'
 import Eligibles from './pages/Eligibles'
+import Interesses from './pages/Interesses'
 import { CLIENT } from './lib/constants'
 
 export default function App() {
@@ -43,6 +44,7 @@ export default function App() {
           <Route path="/leads" element={<Leads />} />
           <Route path="/leads/:id" element={<LeadDetail />} />
           <Route path="/relances" element={<Relances />} />
+          {CLIENT.interestedPage && <Route path="/interesses" element={<Interesses />} />}
           {CLIENT.eligibleButton && <Route path="/eligibles" element={<Eligibles />} />}
           <Route path="/ajouter" element={<AddLead />} />
           <Route path="/admin" element={<Admin />} />
