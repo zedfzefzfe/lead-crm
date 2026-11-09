@@ -45,6 +45,9 @@ export default {
   showAcompte: true,
   showContactPref: true, // "Contact souhaité" column, filled by the landing page pop-up
   quickRelance: false, // no follow-up date column in the list (it stays on the lead page)
+  // "À relancer": only leads called without an answer; max 6 unanswered calls, then Perdue
+  // (supabase/migrations/20261109_creart_call_attempts.sql).
+  relance: { statuts: ['Contacté', 'Pas de réponse'], maxAttempts: 6 },
   interestedPage: 'Intéressée', // "Intéressées" page in the menu: leads with this status
   passwordDelete: true, // trash button on each lead, asks for the delete password (supabase/delete-password.sql)
 

@@ -6,9 +6,10 @@ import { CLIENT, EXTRA_FIELDS, ITEM, STATUTS, RAISONS, SOURCE_LABELS, FIELD_LABE
 import { formatDate, formatDateTime, formatMAD, telLink, whatsappLink } from '../lib/format'
 import StatusBadge from '../components/StatusBadge'
 import DeleteLeadButton from '../components/DeleteLeadButton'
+import { CallAttempts, isRelanceLead } from '../components/CallAttempts'
 import { t, tv } from '../lib/i18n'
 
-const HIST_LABELS = { statut: 'hist.status', raison: 'hist.reason', montant_acompte: 'hist.deposit', notes: 'hist.notes' }
+const HIST_LABELS = { statut: 'hist.status', raison: 'hist.reason', montant_acompte: 'hist.deposit', notes: 'hist.notes', tentatives: 'hist.attempts' }
 
 export default function LeadDetail() {
   const { id } = useParams()
@@ -75,6 +76,7 @@ export default function LeadDetail() {
         <div className="space-y-4 lg:col-span-2">
           <section className="card">
             <h2 className="border-b border-line px-5 py-3 text-[14px] font-semibold">{t('lead.followUp')}</h2>
+            {isRelanceLead(lead) && <div className="border-b border-line px-5 py-3"><CallAttempts lead={lead} /></div>}
             <div className="grid gap-4 p-5 sm:grid-cols-2">
               <div>
                 <label className="label">{t('lead.status')}</label>

@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react'
 import { supabase } from './supabase'
 import { t } from './i18n'
+import { CLIENT } from './constants'
 
 // Holds every lead in memory and keeps the list in sync with Supabase Realtime,
 // so all pages update instantly for everyone who is logged in.
@@ -96,6 +97,15 @@ export function LeadsProvider({ children }) {
     return gone.size
   }, [])
 
+  // +1 unanswered call (the database turns the lead into Perdue at the last allowed call).
+  const registerCallAttempt = useCallback(async (id) => {
+    const { data, error } = await supabase.rpc('register_call_attempt', { p_id: id, p_max: CLIENT.relance?.maxAttempts || 6 })
+    if (error) throw error
+    const row = Array.isArray(data) ? data[0] : data
+    if (row) setLeads((list) => list.map((l) => (l.id === id ? row : l)))
+    return row
+  }, [])
+
   // Any logged-in user, with the delete password (checked by the database, supabase/delete-password.sql).
   const deleteLeadsWithPassword = useCallback(async (ids, password) => {
     const { data, error } = await supabase.rpc('delete_leads_with_password', { p_password: password, p_ids: ids })
@@ -123,7 +133,7 @@ export function LeadsProvider({ children }) {
   }, [])
 
   return (
-    <LeadsContext.Provider value={{ leads, loading, error, updateLead, addLead, deleteLeads, deleteLeadsWithPassword, isAdmin, toasts, notify }}>
+    <LeadsContext.Provider value={{ leads, loading, error, updateLead, addLead, deleteLeads, deleteLeadsWithPassword, registerCallAttempt, isAdmin, toasts, notify }}>
       {children}
     </LeadsContext.Provider>
   )

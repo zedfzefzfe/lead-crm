@@ -7,6 +7,7 @@ import { EligibleToggle, NoteEditor, RelanceInput, StatusSelect } from '../compo
 import LeadCard from '../components/LeadCard'
 import DeleteLeadButton from '../components/DeleteLeadButton'
 import ContactPref from '../components/ContactPref'
+import { AttemptsBadge, isRelanceLead } from '../components/CallAttempts'
 import PageHeader from '../components/PageHeader'
 import { t, tv } from '../lib/i18n'
 
@@ -126,7 +127,10 @@ export default function Leads() {
                     <span className="block min-w-[6.5rem] max-w-[9rem] text-ink">{l[ITEM.key] || '—'}</span>
                     {l.montant_acompte > 0 && <p className="mt-0.5 whitespace-nowrap text-[12px] text-muted">{t('deposit', { x: formatMAD(l.montant_acompte) })}</p>}
                   </td>
-                  <td className="min-w-[11rem] px-3 py-2"><StatusSelect lead={l} /></td>
+                  <td className="min-w-[11rem] px-3 py-2">
+                    <StatusSelect lead={l} />
+                    {isRelanceLead(l) && <AttemptsBadge lead={l} className="mt-1.5 ms-1" />}
+                  </td>
                   <td className="px-2 py-1.5"><NoteEditor lead={l} /></td>
                   {EXTRA_FIELDS.length > 0 && (
                     <td className="whitespace-nowrap px-4 py-3 text-ink">
