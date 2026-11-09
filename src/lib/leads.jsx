@@ -26,8 +26,8 @@ async function fetchAllLeads() {
 
 // Focus on some ateliers (CLIENT.focusAteliers): other leads are hidden, not deleted.
 const plain = (s) => String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ')
-export const inFocus = (lead) =>
-  !CLIENT.focusAteliers || CLIENT.focusAteliers.some((words) => words.every((w) => plain(lead[ITEM.key]).includes(w)))
+export const matchesAtelier = (lead, group) => group.words.every((w) => plain(lead[ITEM.key]).includes(w))
+export const inFocus = (lead) => !CLIENT.focusAteliers || CLIENT.focusAteliers.some((g) => matchesAtelier(lead, g))
 const SHOW_ALL_KEY = 'crm-show-all-ateliers'
 
 export function LeadsProvider({ children }) {

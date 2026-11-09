@@ -105,6 +105,8 @@ const UI = {
     ar: 'هل تأكدت عبر الهاتف من أن {x} مؤهل (قرض أو نقداً)؟ هذا القرار نهائي.',
   },
   'eligible.confirmYes': { fr: 'Oui, confirmé', en: 'Yes, confirmed', ar: 'نعم، تم التأكيد' },
+  'chips.all': { fr: 'Tous', en: 'All', ar: 'الكل' },
+  'chips.label': { fr: 'Filtrer par atelier', en: 'Filter by workshop', ar: 'تصفية حسب الورشة' },
   'focus.on': { fr: 'Affichage :', en: 'Showing:', ar: 'العرض:' },
   'focus.hidden': { fr: '{x} leads d’autres ateliers masqués (pas supprimés)', en: '{x} leads from other workshops hidden (not deleted)', ar: '{x} عميل من ورشات أخرى مخفيون (غير محذوفين)' },
   'focus.showAll': { fr: 'Afficher tous les ateliers', en: 'Show all workshops', ar: 'عرض كل الورشات' },
