@@ -161,6 +161,18 @@ async function wait(seconds) {
   report({ next_at: null });
 }
 
+// Un des 3 messages déjà envoyé depuis ce numéro à cette personne ? (ils contiennent tous « 15 نونبر »)
+const MARK = '15 نونبر';
+async function alreadySent(chatId) {
+  try {
+    const chat = await client.getChatById(chatId);
+    const msgs = await chat.fetchMessages({ limit: 30 });
+    return msgs.some(m => m.fromMe && (m.body || '').includes(MARK));
+  } catch (e) {
+    return false; // pas encore de conversation avec cette personne
+  }
+}
+
 async function run(dry) {
   running = true; stopAsked = false;
   const todo = todoList();
@@ -181,6 +193,14 @@ async function run(dry) {
         if (!reg) {
           log(`⚠️  pas sur WhatsApp, ignoré : ${l.nom} (${l.num})`);
           sent[l.num] = 'no-wa'; save(); skipped++;
+          report({ skipped, remaining: left() });
+          continue;
+        }
+        // Sécurité anti-doublon : si la relance est déjà dans la conversation (envoyée avant un
+        // redémarrage, même sans sent.json), on n'envoie pas une 2e fois.
+        if (await alreadySent(reg._serialized)) {
+          log(`↩️  déjà relancé(e), ignoré : ${l.nom} (${l.num})`);
+          sent[l.num] = 'already'; save(); skipped++;
           report({ skipped, remaining: left() });
           continue;
         }
