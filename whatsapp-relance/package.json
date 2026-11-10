@@ -1,0 +1,10 @@
+{
+  "name": "creart-whatsapp-relance",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Relance WhatsApp cadencée pilotée depuis le CRM Crea'rt (numéro secondaire)",
+  "scripts": { "start": "node runner.js" },
+  "dependencies": {
+    "whatsapp-web.js": "^1.26.0"
+  }
+}

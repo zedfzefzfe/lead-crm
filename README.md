@@ -148,6 +148,16 @@ Only admin accounts can delete leads; the database refuses deletes from everyone
 Add another admin: `insert into public.admins (email) values ('other@email.com');`
 Remove one: `delete from public.admins where email = 'other@email.com';`
 
+## Crea'rt — Relance WhatsApp page
+
+Menu **Relance WhatsApp**: whoever holds the *secondary* phone scans a QR (or types an 8-letter code)
+in the CRM, checks the connected number, then runs a test or the paced sending (batches of 25,
+50–90 s apart, ~45 min between batches). The sending itself is done by the program in
+[`whatsapp-relance/`](whatsapp-relance/README.md), which must run on a computer that stays on.
+
+1. Supabase → SQL Editor: run `supabase/migrations/20261110_creart_whatsapp_relance.sql`.
+2. Follow [`whatsapp-relance/README.md`](whatsapp-relance/README.md) (key from the page, `npm start`).
+
 ## Bajaj — Meta Conversions API "QualifiedLead"
 
 When a salesperson marks a lead **Éligible** and it is still eligible **2 hours later**, a
