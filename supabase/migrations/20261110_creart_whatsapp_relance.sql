@@ -75,7 +75,32 @@ $$;
 revoke all on function public.wa_relance_command(text, text) from public, anon;
 grant execute on function public.wa_relance_command(text, text) to authenticated;
 
--- 4. Admins: see the sender's secret key (to set up the sender program).
+-- 4a. Admins list (same as supabase/admin.sql, WITHOUT the right to delete leads).
+--     Already there if admin.sql was run; created here otherwise.
+create table if not exists public.admins (
+  email text primary key
+);
+alter table public.admins enable row level security;
+revoke all on public.admins from anon, authenticated;
+grant select on public.admins to authenticated;
+drop policy if exists "read_own_admin_row" on public.admins;
+create policy "read_own_admin_row" on public.admins
+  for select to authenticated
+  using (lower(email) = lower(auth.jwt() ->> 'email'));
+
+create or replace function public.is_admin()
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (select 1 from admins where lower(email) = lower(auth.jwt() ->> 'email'));
+$$;
+revoke all on function public.is_admin() from public, anon;
+grant execute on function public.is_admin() to authenticated;
+
+-- 4b. Admins: see the sender's secret key (to set up the sender program).
 create or replace function public.wa_relance_token()
 returns text
 language sql
@@ -146,7 +171,12 @@ $$;
 revoke all on function public.wa_relance_sync(jsonb) from public;
 grant execute on function public.wa_relance_sync(jsonb) to anon, authenticated;
 
--- 6. Live updates on the CRM page.
+-- 6. Who may see the key on the page. ⚠️ Replace the email below by YOUR CRM login email
+--    (shown at the bottom left of the CRM), then Run. Leaving the example is harmless.
+insert into public.admins (email) values (lower('VOTRE_EMAIL@exemple.com'))
+on conflict (email) do nothing;
+
+-- 7. Live updates on the CRM page.
 do $$ begin
   alter publication supabase_realtime add table public.wa_relance;
 exception when duplicate_object then null; end $$;
