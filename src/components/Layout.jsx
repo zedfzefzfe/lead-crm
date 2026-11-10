@@ -17,6 +17,8 @@ const NAV = [
   // Bajaj only (CLIENT.eligibleButton): leads confirmed eligible on the phone.
   { to: '/eligibles', label: 'nav.eligible', short: 'nav.eligible', icon: 'M22 11.1V12a10 10 0 1 1-5.9-9.1M22 4 12 14l-3-3', eligibleOnly: true },
   { to: '/ajouter', label: 'nav.add', short: 'nav.add.short', icon: 'M12 5v14M5 12h14' },
+  // Crea'rt only (CLIENT.waRelance): QR + paced WhatsApp sending from the secondary number.
+  { to: '/relance-whatsapp', label: 'nav.wa', short: 'nav.wa.short', icon: 'M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 20.5l1.6-5.4A8.4 8.4 0 1 1 21 11.5Z', waOnly: true },
 ]
 
 // Shown only to admins (see supabase/admin.sql).
@@ -32,7 +34,9 @@ function Icon({ d, className = 'h-[18px] w-[18px]' }) {
 
 export default function Layout({ user, children }) {
   const { toasts, isAdmin } = useLeads()
-  const base = NAV.filter((n) => (!n.eligibleOnly || CLIENT.eligibleButton) && (!n.interestedOnly || CLIENT.interestedPage))
+  const base = NAV.filter(
+    (n) => (!n.eligibleOnly || CLIENT.eligibleButton) && (!n.interestedOnly || CLIENT.interestedPage) && (!n.waOnly || CLIENT.waRelance),
+  )
   const nav = isAdmin ? [...base, ADMIN_NAV] : base
   const relanceCount = useRelances().length
   const eligibleCount = useEligibles().length

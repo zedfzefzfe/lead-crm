@@ -56,6 +56,9 @@ export default {
   // (supabase/migrations/20261109_creart_call_attempts.sql).
   relance: { statuts: ['Contacté', 'Pas de réponse'], maxAttempts: 6 },
   interestedPage: 'Intéressée', // "Intéressées" page in the menu: leads with this status
+  // "Relance WhatsApp" page: QR + paced sending from the secondary number (whatsapp-relance/,
+  // supabase/migrations/20261110_creart_whatsapp_relance.sql).
+  waRelance: true,
   passwordDelete: true, // trash button on each lead, asks for the delete password (supabase/delete-password.sql)
 
   whatsappMessage: (prenom, item) =>

@@ -13,6 +13,7 @@ import AddLead from './pages/AddLead'
 import Admin from './pages/Admin'
 import Eligibles from './pages/Eligibles'
 import Interesses from './pages/Interesses'
+import RelanceWhatsApp from './pages/RelanceWhatsApp'
 import { CLIENT } from './lib/constants'
 
 export default function App() {
@@ -46,6 +47,7 @@ export default function App() {
           <Route path="/relances" element={<Relances />} />
           {CLIENT.interestedPage && <Route path="/interesses" element={<Interesses />} />}
           {CLIENT.eligibleButton && <Route path="/eligibles" element={<Eligibles />} />}
+          {CLIENT.waRelance && <Route path="/relance-whatsapp" element={<RelanceWhatsApp />} />}
           <Route path="/ajouter" element={<AddLead />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="*" element={<Navigate to="/" replace />} />
