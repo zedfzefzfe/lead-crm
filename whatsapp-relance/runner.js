@@ -96,7 +96,7 @@ function makeClient(pairNumber) {
   });
   c.on('qr', qr => {
     connected = false;
-    report({ status: 'qr', qr, wa_number: null, wa_name: null });
+    report({ status: 'qr', qr, wa_number: null, wa_name: null, pair_code: null, pair_number: null });
     console.log('📱 Nouveau QR affiché dans le CRM (page Relance WhatsApp).');
   });
   c.on('code', code => { report({ status: 'qr', qr: null, pair_code: code, pair_number: pairNumber }); log(`🔢 Code de liaison pour +${pairNumber} : ${code}`); });
@@ -324,7 +324,7 @@ process.on('unhandledRejection', recover);
 process.on('SIGINT', shutdown);
 process.on('SIGTERM', shutdown);
 
-report({ status: 'starting', qr: null, wa_number: null, wa_name: null, remaining: todoList().length,
+report({ status: 'starting', qr: null, pair_code: null, pair_number: null, wa_number: null, wa_name: null, remaining: todoList().length,
          message: 'Programme démarré, ouverture de WhatsApp…' });
 log(`🚀 Programme d'envoi démarré (${leads.length} leads, ${todoList().length} restant(s)).`);
 start();
