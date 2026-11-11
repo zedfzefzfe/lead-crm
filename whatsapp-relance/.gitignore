@@ -2,7 +2,7 @@
 leads.json
 sent.json
 .env
-.wwebjs_auth/
+.wwebjs_auth*
 .wwebjs_cache/
 node_modules/
 *.log

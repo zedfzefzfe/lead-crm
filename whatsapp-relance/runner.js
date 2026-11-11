@@ -140,7 +140,7 @@ function start() {
     report({ status: 'starting', message: 'WhatsApp ne répond pas, nouvel essai…' });
     try { await client.destroy(); } catch (x) {}
     if (startFails >= 2) {
-      try { fs.rmSync(path.join(__dirname, '.wwebjs_auth'), { recursive: true, force: true }); } catch (x) {}
+      try { fs.renameSync(path.join(__dirname, '.wwebjs_auth'), path.join(__dirname, '.wwebjs_auth.bak-' + Date.now())); } catch (x) {}
       log('🧹 Session WhatsApp enregistrée effacée (abîmée) : un nouveau QR va s\'afficher.');
       startFails = 0;
     }
