@@ -85,9 +85,12 @@ async function sync() {
 // ---------- WhatsApp ----------
 let client, connected = false, running = false, stopAsked = false;
 
-function makeClient() {
+// pairNumber : lier avec un code à 8 lettres pour ce numéro (mode intégré de whatsapp-web.js,
+// qui redemande le code tout seul après les rechargements de WhatsApp Web).
+function makeClient(pairNumber) {
   const c = new Client({
     authStrategy: new LocalAuth({ dataPath: path.join(__dirname, '.wwebjs_auth') }),
+    ...(pairNumber ? { pairWithPhoneNumber: { phoneNumber: pairNumber, showNotification: true } } : {}),
     // handleSIG*: false -> Ctrl+C passe par shutdown() (prévient le CRM avant de fermer).
     puppeteer: { args: ['--no-sandbox', '--disable-setuid-sandbox'], handleSIGINT: false, handleSIGTERM: false, handleSIGHUP: false },
   });
@@ -96,7 +99,7 @@ function makeClient() {
     report({ status: 'qr', qr, wa_number: null, wa_name: null });
     console.log('📱 Nouveau QR affiché dans le CRM (page Relance WhatsApp).');
   });
-  c.on('code', code => report({ pair_code: code }));
+  c.on('code', code => { report({ status: 'qr', qr: null, pair_code: code, pair_number: pairNumber }); log(`🔢 Code de liaison pour +${pairNumber} : ${code}`); });
   c.on('authenticated', () => report({ status: 'starting', qr: null, pair_code: null, message: 'Lien accepté, connexion…' }));
   c.on('auth_failure', m => { report({ status: 'error', message: 'Échec de connexion WhatsApp : ' + m }); log('❌ échec connexion : ' + m); });
   c.on('ready', async () => {
@@ -114,6 +117,9 @@ function makeClient() {
     log(`✅ Connecté : +${num} (${c.info?.pushname || ''})`);
   });
   c.on('disconnected', async reason => {
+    // 'LOGOUT' = WhatsApp Web recharge sa page (par ex. pendant la liaison) : la bibliothèque
+    // s'en occupe toute seule. Fermer le navigateur à ce moment-là faisait planter le programme.
+    if (reason === 'LOGOUT' && !connected) { console.log('↻ WhatsApp Web se recharge…'); return; }
     connected = false; stopAsked = true;
     log('🔌 WhatsApp déconnecté : ' + reason);
     report({ status: 'starting', wa_number: null, wa_name: null, message: 'Déconnecté, nouveau QR…' });
@@ -125,8 +131,9 @@ function makeClient() {
 // Ouvre WhatsApp ; si la page ne charge pas (réseau), réessaie toute seule après 20 s.
 // Après 2 échecs de suite, la session enregistrée est sans doute abîmée : on l'efface (il faudra rescanner).
 let startFails = 0;
+let pairNumber = null;
 function start() {
-  client = makeClient();
+  client = makeClient(pairNumber);
   client.initialize().then(() => { startFails = 0; }).catch(async e => {
     startFails++;
     log('❌ Ouverture de WhatsApp échouée (' + e.message + '). Nouvel essai dans 20 s…');
@@ -145,6 +152,7 @@ let relinking = false;
 async function relink(doLogout = true) {
   if (relinking) return; relinking = true;
   connected = false; stopAsked = true;
+  pairNumber = null; // après une déconnexion, on revient au QR
   try { if (doLogout) await client.logout(); } catch (e) {}
   try { await client.destroy(); } catch (e) {}
   // Retire la session enregistrée : le prochain QR repart de zéro.
@@ -269,10 +277,12 @@ async function handle(c) {
     if (connected) return log('ℹ️  Déjà connecté : déconnecte d\'abord ce numéro.');
     if (num.length < 10) return log('ℹ️  Numéro invalide pour le code (format 2126XXXXXXXX).');
     if (ALLOWED && num !== ALLOWED) return log(`⛔ Code refusé : seul le numéro secondaire ${ALLOWED} est autorisé.`);
-    report({ pair_number: num, pair_code: null });
-    const code = await client.requestPairingCode(num, true);
-    report({ pair_code: code });
-    log(`🔢 Code de liaison pour +${num} : ${code}`);
+    report({ pair_number: num, pair_code: null, message: 'Demande du code…' });
+    log(`🔢 Code de liaison demandé pour +${num}…`);
+    // Relance WhatsApp en mode « code » pour ce numéro ; le code arrive par l'événement 'code'.
+    pairNumber = num;
+    try { await client.destroy(); } catch (e) {}
+    start();
     return;
   }
   if (cmd === 'pause') { if (running) stopAsked = true; return; }
@@ -300,6 +310,17 @@ async function shutdown() {
   try { await client.destroy(); } catch (e) {}
   process.exit(0);
 }
+// Une erreur imprévue ne doit jamais arrêter l'envoi : on la note et on rouvre WhatsApp.
+let recovering = false;
+async function recover(e) {
+  log('❌ Erreur imprévue : ' + (e && e.message ? e.message : e));
+  if (recovering) return; recovering = true;
+  connected = false; stopAsked = true;
+  try { await client.destroy(); } catch (x) {}
+  setTimeout(() => { recovering = false; start(); }, 5000);
+}
+process.on('uncaughtException', recover);
+process.on('unhandledRejection', recover);
 process.on('SIGINT', shutdown);
 process.on('SIGTERM', shutdown);
 
