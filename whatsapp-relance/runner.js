@@ -313,7 +313,14 @@ async function shutdown() {
 // Une erreur imprévue ne doit jamais arrêter l'envoi : on la note et on rouvre WhatsApp.
 let recovering = false;
 async function recover(e) {
-  log('❌ Erreur imprévue : ' + (e && e.message ? e.message : e));
+  const msg = e && e.message ? e.message : String(e);
+  // Pendant la liaison, WhatsApp Web recharge sa page : ces erreurs sont normales et la
+  // bibliothèque continue toute seule. Fermer le navigateur ici cassait la liaison.
+  if (!connected && /Execution context was destroyed|detached Frame|Target closed|navigation/i.test(msg)) {
+    console.log('↻ (rechargement pendant la liaison, ignoré) ' + msg);
+    return;
+  }
+  log('❌ Erreur imprévue : ' + msg);
   if (recovering) return; recovering = true;
   connected = false; stopAsked = true;
   try { await client.destroy(); } catch (x) {}
