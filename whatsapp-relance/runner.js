@@ -29,6 +29,7 @@ const PER_BATCH       = 25;        // messages par lot
 const MSG_MIN         = 50;        // secondes min entre 2 messages
 const MSG_MAX         = 90;        // secondes max entre 2 messages
 const BATCH_PAUSE_MIN = 45 * 60;   // pause entre lots (secondes) -> 45 min
+const DAILY_MAX       = Number(process.env.DAILY_MAX || 70); // max d'envois réels par jour (heure du Maroc)
 
 const MESSAGES = [
 `سلام {nom} 🌸 كنتمنى تكوني بخير
@@ -173,14 +174,25 @@ async function alreadySent(chatId) {
   }
 }
 
+// Jour au Maroc (YYYY-MM-DD) et nombre de messages réellement envoyés ce jour-là (d'après sent.json).
+const dayMA = d => new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Casablanca' }).format(d);
+const sentToday = () => Object.values(sent).filter(v => /^\d{4}-/.test(v) && dayMA(new Date(v)) === dayMA(new Date())).length;
+
 async function run(dry) {
+  if (!dry && sentToday() >= DAILY_MAX) {
+    log(`🛑 Limite du jour atteinte (${DAILY_MAX} messages). Reprends demain avec « Lancer l'envoi ».`);
+    report({ status: 'paused', message: `Limite du jour atteinte (${DAILY_MAX}). Reprends demain.` });
+    return;
+  }
   running = true; stopAsked = false;
+  let dailyStop = false;
   const todo = todoList();
   let done = 0, failed = 0, skipped = 0, inBatch = 0;
   const left = () => todo.length - done - failed - skipped;
   report({ status: dry ? 'testing' : 'sending', dry_run: dry, total: todo.length, done, failed, skipped,
            remaining: todo.length, message: null, next_at: null });
-  log(`▶️  ${todo.length} à ${dry ? 'tester (rien n\'est envoyé)' : 'envoyer'}, par lots de ${PER_BATCH}`);
+  log(`▶️  ${todo.length} à ${dry ? 'tester (rien n\'est envoyé)' : 'envoyer'}, par lots de ${PER_BATCH}` +
+      (dry ? '' : ` — max ${DAILY_MAX} aujourd'hui (déjà ${sentToday()})`));
 
   for (const l of todo) {
     if (stopAsked) break;
@@ -209,6 +221,7 @@ async function run(dry) {
       }
       done++; inBatch++;
       if (!dry) log(`✅ ${done}. ${l.nom}  (${l.num})`);
+      if (!dry && sentToday() >= DAILY_MAX) dailyStop = true;
     } catch (e) {
       log(`❌ erreur ${l.nom} (${l.num}) : ${e.message}`);
       if (!dry) { sent[l.num] = 'error'; save(); }
@@ -217,6 +230,7 @@ async function run(dry) {
     report({ done, failed, remaining: left() });
     if (dry) { if (inBatch >= PER_BATCH) { inBatch = 0; log(`--- fin du lot de ${PER_BATCH} (pause ~${Math.round(BATCH_PAUSE_MIN / 60)} min en réel) ---`); } continue; }
     if (left() === 0) break;
+    if (dailyStop) break;
     if (inBatch >= PER_BATCH) {
       inBatch = 0;
       log(`⏸️  Lot de ${PER_BATCH} terminé. Pause ~${Math.round(BATCH_PAUSE_MIN / 60)} min…`);
@@ -233,6 +247,10 @@ async function run(dry) {
     log(`🧪 Test terminé : ${done} personne(s) seraient contactées. Rien n'a été envoyé.`);
     report({ status: connected ? 'connected' : 'starting', remaining: todoList().length,
              message: `Test OK : ${done} personne(s) seraient contactées. Rien n'a été envoyé.` });
+  } else if (dailyStop && left() > 0) {
+    log(`🛑 Limite du jour atteinte : ${DAILY_MAX} messages aujourd'hui. ${left()} restant(s) → demain, clique « Reprendre l'envoi ».`);
+    report({ status: 'paused', remaining: todoList().length,
+             message: `Limite du jour (${DAILY_MAX}) atteinte. ${left()} restant(s) : reprends demain avec « Reprendre l'envoi ».` });
   } else if (stopped) {
     log(`⏸️  En pause. ${done} envoyé(s) ; ${left()} restant(s). « Lancer l'envoi » reprend où on s'est arrêté.`);
     report({ status: connected ? 'paused' : 'starting', remaining: todoList().length, message: `En pause après ${done} envoi(s).` });
