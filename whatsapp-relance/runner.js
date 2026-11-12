@@ -53,6 +53,11 @@ const readJson = f => { try { return JSON.parse(fs.readFileSync(f, 'utf8')); } c
 const greeted = readJson(GREET_FILE), followed = readJson(FOLLOW_FILE);
 const saveGreet = () => fs.writeFileSync(GREET_FILE, JSON.stringify(greeted));
 const saveFollow = () => fs.writeFileSync(FOLLOW_FILE, JSON.stringify(followed));
+// chats.json : identifiant de conversation WhatsApp (souvent « …@lid ») -> numéro du lead.
+const CHAT_FILE = path.join(__dirname, 'chats.json');
+const chats = readJson(CHAT_FILE);
+const saveChats = () => fs.writeFileSync(CHAT_FILE, JSON.stringify(chats));
+const chatOf = num => Object.keys(chats).find(id => chats[id] === num);
 const rand  = (a, b) => a + Math.random() * (b - a);
 const pick  = a => a[Math.floor(Math.random() * a.length)];
 const todoList = () => leads.filter(l => l.num && !sent[l.num]);
@@ -219,7 +224,7 @@ async function processFollow() {
 }
 async function onIncoming(msg) {
   if (msg.fromMe || msg.isStatus || (msg.from || '').endsWith('@g.us')) return;
-  let num = (msg.from || '').split('@')[0];
+  let num = chats[msg.from] || (msg.from || '').split('@')[0];
   if (!greeted[num]) { try { num = (await msg.getContact()).number || num; } catch (e) {} }
   if (greeted[num] && !followed[num]) queueFollow(num, msg.from);
 }
@@ -231,7 +236,7 @@ async function catchUpReplies() {
   for (const num of nums) {
     if (!connected) return;
     try {
-      const chat = await withTimeout(client.getChatById(num + '@c.us'), 20, 'conversation');
+      const chat = await withTimeout(client.getChatById(chatOf(num) || num + '@c.us'), 20, 'conversation');
       const msgs = await withTimeout(chat.fetchMessages({ limit: 10 }), 20, 'historique');
       const since = new Date(greeted[num]).getTime();
       if (msgs.some(m => !m.fromMe && m.timestamp * 1000 > since)) { found++; queueFollow(num, chat.id._serialized); }
@@ -281,7 +286,7 @@ async function run(dry) {
         // Si l'envoi ne répond pas, on note « error » (pas de 2e essai : il est peut-être parti).
         sent[l.num] = 'error'; save();
         await withTimeout(client.sendMessage(reg._serialized, text), 60, 'envoi');
-        sent[l.num] = greeted[l.num] = new Date().toISOString(); save(); saveGreet();
+        sent[l.num] = greeted[l.num] = new Date().toISOString(); chats[reg._serialized] = l.num; save(); saveGreet(); saveChats();
       }
       done++; inBatch++;
       if (!dry) log(`✅ ${done}. ${l.nom}  (${l.num})`);
