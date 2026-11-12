@@ -99,6 +99,9 @@ function makeClient(pairNumber) {
     console.log('📱 Nouveau QR affiché dans le CRM (page Relance WhatsApp).');
   });
   c.on('code', code => { report({ status: 'qr', qr: null, pair_code: code, pair_number: pairNumber }); log(`🔢 Code de liaison pour +${pairNumber} : ${code}`); });
+  c.on('loading_screen', (pct, m) => console.log(`… chargement WhatsApp ${pct}% ${m || ''}`));
+  c.on('change_state', st => console.log('… état WhatsApp : ' + st));
+  c.on('authenticated', () => console.log('… session acceptée'));
   c.on('authenticated', () => report({ status: 'starting', qr: null, pair_code: null, message: 'Lien accepté, connexion…' }));
   c.on('auth_failure', m => { report({ status: 'error', message: 'Échec de connexion WhatsApp : ' + m }); log('❌ échec connexion : ' + m); });
   c.on('ready', async () => {
