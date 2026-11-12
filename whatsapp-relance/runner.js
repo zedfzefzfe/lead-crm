@@ -28,7 +28,7 @@ if (!RELANCE_TOKEN) {
 const PER_BATCH       = 25;        // messages par lot
 const MSG_MIN         = 50;        // secondes min entre 2 messages
 const MSG_MAX         = 90;        // secondes max entre 2 messages
-const BATCH_PAUSE_MIN = 45 * 60;   // pause entre lots (secondes) -> 45 min
+const BATCH_PAUSE_MIN = Number(process.env.BATCH_PAUSE_MIN ?? 45) * 60; // pause entre lots (secondes) ; 0 = pas de pause
 const DAILY_MAX       = Number(process.env.DAILY_MAX || 70); // max d'envois réels par jour (heure du Maroc)
 
 // Étape 1 : salutation seule (une des deux, au hasard). {nom} vide => sans prénom.
@@ -87,7 +87,7 @@ async function sync() {
 }
 
 // ---------- WhatsApp ----------
-let client, connected = false, running = false, stopAsked = false;
+let client, connected = false, running = false, stopAsked = false, autoStarted = false;
 
 // pairNumber : lier avec un code à 8 lettres pour ce numéro (mode intégré de whatsapp-web.js,
 // qui redemande le code tout seul après les rechargements de WhatsApp Web).
@@ -123,6 +123,12 @@ function makeClient(pairNumber) {
              message: `Connecté. ${n} personne(s) restent à contacter.` });
     log(`✅ Connecté : +${num} (${c.info?.pushname || ''})`);
     setTimeout(() => catchUpReplies().catch(e => log('❌ réponses : ' + e.message)), 10000);
+    // AUTOSTART=1 : reprend l'envoi tout seul après un redémarrage (sans clic dans le CRM).
+    if (process.env.AUTOSTART === '1' && !running && !autoStarted && todoList().length) {
+      autoStarted = true;
+      log('▶️  Reprise automatique de l\'envoi.');
+      run(false).catch(e => { running = false; log('❌ ' + e.message); });
+    }
   });
   c.on('message', msg => onIncoming(msg).catch(e => log('❌ réponse : ' + e.message)));
   c.on('disconnected', async reason => {
@@ -300,7 +306,7 @@ async function run(dry) {
     if (dry) { if (inBatch >= PER_BATCH) { inBatch = 0; log(`--- fin du lot de ${PER_BATCH} (pause ~${Math.round(BATCH_PAUSE_MIN / 60)} min en réel) ---`); } continue; }
     if (left() === 0) break;
     if (dailyStop) break;
-    if (inBatch >= PER_BATCH) {
+    if (inBatch >= PER_BATCH && BATCH_PAUSE_MIN > 0) {
       inBatch = 0;
       log(`⏸️  Lot de ${PER_BATCH} terminé. Pause ~${Math.round(BATCH_PAUSE_MIN / 60)} min…`);
       await wait(BATCH_PAUSE_MIN + rand(0, 300));
