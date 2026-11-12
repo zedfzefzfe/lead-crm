@@ -31,21 +31,15 @@ const MSG_MAX         = 90;        // secondes max entre 2 messages
 const BATCH_PAUSE_MIN = 45 * 60;   // pause entre lots (secondes) -> 45 min
 const DAILY_MAX       = Number(process.env.DAILY_MAX || 70); // max d'envois réels par jour (heure du Maroc)
 
-const MESSAGES = [
-`سلام {nom} 🌸 كنتمنى تكوني بخير
-فكرت فيك حيت كنتي مهتمة بالدورة ديال صناعة الشموع 🕯️
-رجعنا بدورة جديدة فـ كازا نهار 15 نونبر، وبقاو غير شي كام ديال البلايص.
-غادي تعلمي كلشي: التلوين، التعطير والتزيين، مع المواد + الكتاب + شهادة المشاركة.
-غاديين تكوني معانا؟ نخلي ليك البلاصة ديالك؟ 🤍`,
-`سلام {nom} 🌸 إن شاء الله لاباس عليك
-تذكرتك حيت كنتي باغية تتعلمي صناعة الشموع 🕯️ رجعنا بدورة جديدة فـ كازا نهار 15 نونبر وبقاو غير شي بلايص قلال.
-غادي تخرجي عارفة كلشي — التلوين، التعطير والتزيين — مع المواد والكتاب وشهادة.
-واش نحسبك معانا؟ نسد ليك بلاصتك؟ 🤍`,
-`أهلا {nom} 🌸 كيف داير الحال؟
-بقيتي فبالي من الدورة ديال الشموع اللي كنتي مهتمة بيها 🕯️ رجعاتنا دورة جديدة فـ كازا 15 نونبر، والبلايص بقاو قلال.
-كاع التقنيات غادي تعلميهم، مع المواد + الكتاب + شهادة المشاركة.
-غاديا تفوتيها؟ ولا نثبت ليك البلاصة ديالك؟ 🤍`
+// Étape 1 : salutation seule (une des deux, au hasard). {nom} vide => sans prénom.
+const GREETINGS = [
+  'سلام {nom}، كنتمنى تكوني بخير',
+  'سلام {nom}، لاباس عليك؟',
 ];
+// Étape 2 : envoyé seulement quand la personne a répondu à la salutation.
+const FOLLOWUP = 'بغيت غير نعلمك، حيت كنتي مهتمة بالفورماسيون ديال الشموع، عندنا فورماسيون جديدة نهار 15 نونبر إن شاء الله فكازا، ولكن الكروب صغير بزاف. واش نخلي ليك بلاصتك معانا؟';
+const greetingFor = l => pick(GREETINGS).replace(l.prenom ? '{nom}' : ' {nom}', l.prenom || '');
+const FOLLOW_MIN = 25, FOLLOW_MAX = 60; // secondes avant de répondre (comme une personne)
 // ==========================================================================
 
 const LEADS_FILE = path.join(__dirname, 'leads.json');
@@ -54,6 +48,12 @@ const leads = JSON.parse(fs.readFileSync(LEADS_FILE, 'utf8'));
 let sent = {};
 try { sent = JSON.parse(fs.readFileSync(SENT_FILE, 'utf8')); } catch (e) {}
 const save  = () => fs.writeFileSync(SENT_FILE, JSON.stringify(sent));
+// greeted.json : salutation envoyée {num: date} ; followup.json : message 2 envoyé {num: date}.
+const GREET_FILE = path.join(__dirname, 'greeted.json'), FOLLOW_FILE = path.join(__dirname, 'followup.json');
+const readJson = f => { try { return JSON.parse(fs.readFileSync(f, 'utf8')); } catch (e) { return {}; } };
+const greeted = readJson(GREET_FILE), followed = readJson(FOLLOW_FILE);
+const saveGreet = () => fs.writeFileSync(GREET_FILE, JSON.stringify(greeted));
+const saveFollow = () => fs.writeFileSync(FOLLOW_FILE, JSON.stringify(followed));
 const rand  = (a, b) => a + Math.random() * (b - a);
 const pick  = a => a[Math.floor(Math.random() * a.length)];
 const todoList = () => leads.filter(l => l.num && !sent[l.num]);
@@ -115,7 +115,9 @@ function makeClient(pairNumber) {
     report({ status: 'connected', qr: null, pair_code: null, pair_number: null, wa_number: num, wa_name: c.info?.pushname || '', remaining: n,
              message: `Connecté. ${n} personne(s) restent à contacter.` });
     log(`✅ Connecté : +${num} (${c.info?.pushname || ''})`);
+    setTimeout(() => catchUpReplies().catch(e => log('❌ réponses : ' + e.message)), 10000);
   });
+  c.on('message', msg => onIncoming(msg).catch(e => log('❌ réponse : ' + e.message)));
   c.on('disconnected', async reason => {
     // 'LOGOUT' = WhatsApp Web recharge sa page (par ex. pendant la liaison) : la bibliothèque
     // s'en occupe toute seule. Fermer le navigateur à ce moment-là faisait planter le programme.
@@ -186,6 +188,52 @@ async function alreadySent(chatId) {
 const dayMA = d => new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Casablanca' }).format(d);
 const sentToday = () => Object.values(sent).filter(v => /^\d{4}-/.test(v) && dayMA(new Date(v)) === dayMA(new Date())).length;
 
+// ---------- Étape 2 : quand une personne saluée répond, on envoie le message de la formation ----------
+const followQueue = []; let following = false;
+function queueFollow(num, chatId) {
+  if (followed[num] || followQueue.some(q => q.num === num)) return;
+  followQueue.push({ num, chatId });
+  if (!following) processFollow();
+}
+async function processFollow() {
+  following = true;
+  while (followQueue.length) {
+    const { num, chatId } = followQueue.shift();
+    if (followed[num]) continue;
+    await new Promise(r => setTimeout(r, rand(FOLLOW_MIN, FOLLOW_MAX) * 1000));
+    if (!connected) { followQueue.unshift({ num, chatId }); break; }
+    const l = leads.find(x => x.num === num) || { nom: num };
+    try {
+      await client.sendMessage(chatId, FOLLOWUP);
+      followed[num] = new Date().toISOString(); saveFollow();
+      log(`💬 ${l.nom} (${num}) a répondu → message de la formation envoyé.`);
+    } catch (e) { log(`❌ message 2 pour ${l.nom} (${num}) : ${e.message}`); }
+  }
+  following = false;
+}
+async function onIncoming(msg) {
+  if (msg.fromMe || msg.isStatus || (msg.from || '').endsWith('@g.us')) return;
+  let num = (msg.from || '').split('@')[0];
+  if (!greeted[num]) { try { num = (await msg.getContact()).number || num; } catch (e) {} }
+  if (greeted[num] && !followed[num]) queueFollow(num, msg.from);
+}
+// Au démarrage : réponses arrivées pendant que le programme était éteint.
+async function catchUpReplies() {
+  const nums = Object.keys(greeted).filter(n => !followed[n]);
+  if (!nums.length) return;
+  let found = 0;
+  for (const num of nums) {
+    if (!connected) return;
+    try {
+      const chat = await client.getChatById(num + '@c.us');
+      const msgs = await chat.fetchMessages({ limit: 10 });
+      const since = new Date(greeted[num]).getTime();
+      if (msgs.some(m => !m.fromMe && m.timestamp * 1000 > since)) { found++; queueFollow(num, chat.id._serialized); }
+    } catch (e) {}
+  }
+  log(`🔎 Réponses vérifiées : ${found} personne(s) ont répondu pendant l'arrêt.`);
+}
+
 async function run(dry) {
   if (!dry && sentToday() >= DAILY_MAX) {
     log(`🛑 Limite du jour atteinte (${DAILY_MAX} messages). Reprends demain avec « Lancer l'envoi ».`);
@@ -204,10 +252,10 @@ async function run(dry) {
 
   for (const l of todo) {
     if (stopAsked) break;
-    const text = pick(MESSAGES).replaceAll('{nom}', l.prenom || '');
+    const text = greetingFor(l);
     try {
       if (dry) {
-        log(`• (test) ${l.nom}  ${l.num}  →  ${text.split('\n')[0]}`);
+        log(`• (test) ${l.nom}  ${l.num}  →  ${text}`);
       } else {
         const reg = await client.getNumberId(l.num);           // le numero est-il sur WhatsApp ?
         if (!reg) {
@@ -225,7 +273,7 @@ async function run(dry) {
           continue;
         }
         await client.sendMessage(reg._serialized, text);
-        sent[l.num] = new Date().toISOString(); save();
+        sent[l.num] = greeted[l.num] = new Date().toISOString(); save(); saveGreet();
       }
       done++; inBatch++;
       if (!dry) log(`✅ ${done}. ${l.nom}  (${l.num})`);

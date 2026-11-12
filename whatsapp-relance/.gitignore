@@ -6,3 +6,6 @@ sent.json
 .wwebjs_cache/
 node_modules/
 *.log
+leads.backup.json
+greeted.json
+followup.json
