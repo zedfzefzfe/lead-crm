@@ -176,13 +176,17 @@ async function wait(seconds) {
 
 // Un des 3 messages déjà envoyé depuis ce numéro à cette personne ? (ils contiennent tous « 15 نونبر »)
 const MARK = '15 نونبر';
+const withTimeout = (p, sec, what) => Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error(`${what} : pas de réponse de WhatsApp après ${sec} s`)), sec * 1000))]);
+// Déjà écrit à cette personne (relance « 15 نونبر » ou salutation) ? Ne bloque jamais plus de 20 s.
+const isOurs = m => m && m.fromMe && ((m.body || '').includes(MARK) || (m.body || '').includes('لاباس عليك'));
 async function alreadySent(chatId) {
   try {
-    const chat = await client.getChatById(chatId);
-    const msgs = await chat.fetchMessages({ limit: 30 });
-    return msgs.some(m => m.fromMe && (m.body || '').includes(MARK));
+    const chat = await withTimeout(client.getChatById(chatId), 20, 'conversation');
+    if (isOurs(chat.lastMessage)) return true;
+    const msgs = await withTimeout(chat.fetchMessages({ limit: 30 }), 20, 'historique');
+    return msgs.some(isOurs);
   } catch (e) {
-    return false; // pas encore de conversation avec cette personne
+    return false; // pas de conversation, ou WhatsApp trop lent : on continue
   }
 }
 
@@ -206,7 +210,7 @@ async function processFollow() {
     if (!connected) { followQueue.unshift({ num, chatId }); break; }
     const l = leads.find(x => x.num === num) || { nom: num };
     try {
-      await client.sendMessage(chatId, FOLLOWUP);
+      await withTimeout(client.sendMessage(chatId, FOLLOWUP), 60, 'envoi');
       followed[num] = new Date().toISOString(); saveFollow();
       log(`💬 ${l.nom} (${num}) a répondu → message de la formation envoyé.`);
     } catch (e) { log(`❌ message 2 pour ${l.nom} (${num}) : ${e.message}`); }
@@ -227,8 +231,8 @@ async function catchUpReplies() {
   for (const num of nums) {
     if (!connected) return;
     try {
-      const chat = await client.getChatById(num + '@c.us');
-      const msgs = await chat.fetchMessages({ limit: 10 });
+      const chat = await withTimeout(client.getChatById(num + '@c.us'), 20, 'conversation');
+      const msgs = await withTimeout(chat.fetchMessages({ limit: 10 }), 20, 'historique');
       const since = new Date(greeted[num]).getTime();
       if (msgs.some(m => !m.fromMe && m.timestamp * 1000 > since)) { found++; queueFollow(num, chat.id._serialized); }
     } catch (e) {}
@@ -259,7 +263,7 @@ async function run(dry) {
       if (dry) {
         log(`• (test) ${l.nom}  ${l.num}  →  ${text}`);
       } else {
-        const reg = await client.getNumberId(l.num);           // le numero est-il sur WhatsApp ?
+        const reg = await withTimeout(client.getNumberId(l.num), 30, 'vérification du numéro');           // le numero est-il sur WhatsApp ?
         if (!reg) {
           log(`⚠️  pas sur WhatsApp, ignoré : ${l.nom} (${l.num})`);
           sent[l.num] = 'no-wa'; save(); skipped++;
@@ -274,7 +278,9 @@ async function run(dry) {
           report({ skipped, remaining: left() });
           continue;
         }
-        await client.sendMessage(reg._serialized, text);
+        // Si l'envoi ne répond pas, on note « error » (pas de 2e essai : il est peut-être parti).
+        sent[l.num] = 'error'; save();
+        await withTimeout(client.sendMessage(reg._serialized, text), 60, 'envoi');
         sent[l.num] = greeted[l.num] = new Date().toISOString(); save(); saveGreet();
       }
       done++; inBatch++;
