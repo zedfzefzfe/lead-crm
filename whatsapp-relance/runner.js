@@ -33,7 +33,6 @@ const DAILY_MAX       = Number(process.env.DAILY_MAX || 70); // max d'envois ré
 
 // Étape 1 : salutation seule (une des deux, au hasard). {nom} vide => sans prénom.
 const GREETINGS = [
-  'سلام {nom}، كنتمنى تكوني بخير',
   'سلام {nom}، لاباس عليك؟',
 ];
 // Étape 2 : envoyé seulement quand la personne a répondu à la salutation.
