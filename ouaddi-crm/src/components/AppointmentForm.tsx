@@ -1,12 +1,10 @@
 import { useEffect, useState } from 'react'
-import { Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input, Label, Select, Textarea } from '@/components/ui/input'
 import { Chips } from '@/components/Chips'
-import { CityBadge } from '@/components/Badges'
 import { APPT_TYPE_LABEL, APPT_TYPES, CITY_LABEL } from '@/lib/labels'
 import { todayKey, toInstant } from '@/lib/dates'
-import { displayPhone } from '@/lib/phone'
+import { displayPhone, isValidPhone, normalizePhone } from '@/lib/phone'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/lib/auth'
 import { useToast } from '@/lib/toast'
@@ -28,8 +26,8 @@ export function AppointmentForm({ defaults, onDone }: { defaults: AppointmentDef
   const toast = useToast()
   const { session } = useAuth()
   const [lead, setLead] = useState<LeadLite | null>(null)
-  const [query, setQuery] = useState('')
-  const [results, setResults] = useState<LeadLite[]>([])
+  const [name, setName] = useState('') // new client (when not opened from a lead page)
+  const [phone, setPhone] = useState('')
   const [type, setType] = useState<ApptType>(defaults.type ?? 'mesures')
   const [date, setDate] = useState(defaults.date ?? todayKey())
   const [time, setTime] = useState(defaults.time ?? '10:00')
@@ -51,24 +49,26 @@ export function AppointmentForm({ defaults, onDone }: { defaults: AppointmentDef
       .then(({ data }) => data && pick(data as LeadLite))
   }, [defaults.leadId])
 
-  useEffect(() => {
-    if (lead) return
-    const q = query.trim()
-    const t = setTimeout(async () => {
-      let req = supabase.from('leads').select('id, full_name, phone, city, address, stage').order('updated_at', { ascending: false }).limit(8)
-      if (q) {
-        const safe = q.replace(/[,()%]/g, ' ')
-        req = req.or(`full_name.ilike.%${safe}%,phone.ilike.%${safe.replace(/\D/g, '') || safe}%`)
-      }
-      const { data } = await req
-      setResults((data as LeadLite[]) ?? [])
-    }, 200)
-    return () => clearTimeout(t)
-  }, [query, lead])
+  // Typed client: reuse the lead with the same number, otherwise create it.
+  async function resolveLead(): Promise<LeadLite | null> {
+    if (lead) return lead
+    const digits = normalizePhone(phone)
+    if (!name.trim()) { toast('Nom du client manquant', true); return null }
+    if (!isValidPhone(digits)) { toast('Numéro invalide (ex. 0661234567)', true); return null }
+    const cols = 'id, full_name, phone, city, address, stage'
+    const { data: found } = await supabase.from('leads').select(cols).eq('phone', digits).limit(1)
+    if (found?.length) return found[0] as LeadLite
+    const { data, error } = await supabase.from('leads')
+      .insert({ full_name: name.trim(), phone: digits, city, address: address.trim() || null, stage: 'contacte' })
+      .select(cols).single()
+    if (error) { toast(error.message, true); return null }
+    return data as LeadLite
+  }
 
   async function save() {
-    if (!lead) return toast('Choisis le client', true)
     setSaving(true)
+    const lead = await resolveLead()
+    if (!lead) return setSaving(false)
     const { error } = await supabase.from('appointments').insert({
       lead_id: lead.id,
       type,
@@ -97,36 +97,26 @@ export function AppointmentForm({ defaults, onDone }: { defaults: AppointmentDef
 
   return (
     <form className="space-y-4" onSubmit={e => { e.preventDefault(); save() }}>
-      <div>
-        <Label>Client</Label>
-        {lead ? (
-          <div className="flex items-center justify-between gap-2 rounded-lg border bg-secondary/50 p-3">
-            <div className="min-w-0">
-              <div className="truncate font-medium">{lead.full_name}</div>
-              <div className="text-xs text-muted-foreground">{displayPhone(lead.phone)}</div>
-            </div>
-            {!defaults.leadId && <Button type="button" variant="ghost" size="sm" onClick={() => setLead(null)}>Changer</Button>}
+      {lead ? (
+        <div>
+          <Label>Client</Label>
+          <div className="rounded-lg border bg-secondary/50 p-3">
+            <div className="truncate font-medium">{lead.full_name}</div>
+            <div className="text-xs text-muted-foreground">{displayPhone(lead.phone)}</div>
           </div>
-        ) : (
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div>
-            <div className="relative">
-              <Search className="pointer-events-none absolute top-3.5 left-3 size-4 text-muted-foreground" />
-              <Input autoFocus className="pl-9" value={query} onChange={e => setQuery(e.target.value)} placeholder="Nom ou téléphone" />
-            </div>
-            <ul className="mt-2 max-h-56 divide-y overflow-y-auto rounded-lg border">
-              {results.map(r => (
-                <li key={r.id}>
-                  <button type="button" onClick={() => pick(r)} className="flex w-full items-center justify-between gap-2 px-3 py-3 text-left hover:bg-secondary">
-                    <span className="truncate">{r.full_name}</span>
-                    <CityBadge city={r.city} />
-                  </button>
-                </li>
-              ))}
-              {!results.length && <li className="px-3 py-3 text-sm text-muted-foreground">Aucun lead trouvé</li>}
-            </ul>
+            <Label htmlFor="af-name">Nom du client</Label>
+            <Input id="af-name" autoFocus autoComplete="off" value={name} onChange={e => setName(e.target.value)} placeholder="Salma Bennani" />
           </div>
-        )}
-      </div>
+          <div>
+            <Label htmlFor="af-phone">Téléphone</Label>
+            <Input id="af-phone" type="tel" inputMode="tel" value={phone} onChange={e => setPhone(e.target.value)} placeholder="06 61 23 45 67" />
+          </div>
+        </div>
+      )}
       <div>
         <Label>Type</Label>
         <Chips value={type} options={APPT_TYPES} onChange={setType} labels={APPT_TYPE_LABEL} />
