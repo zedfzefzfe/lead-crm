@@ -7,7 +7,7 @@ import { EligibleToggle, NoteEditor, RelanceInput, StatusSelect } from '../compo
 import LeadCard from '../components/LeadCard'
 import DeleteLeadButton from '../components/DeleteLeadButton'
 import ContactPref from '../components/ContactPref'
-import SourceTag from '../components/SourceTag'
+import SourceTag, { isCapiLead } from '../components/SourceTag'
 import { AttemptsBadge, isRelanceLead } from '../components/CallAttempts'
 import PageHeader from '../components/PageHeader'
 import { t, tv } from '../lib/i18n'
@@ -135,7 +135,7 @@ export default function Leads() {
                       {l.nom}
                     </Link>
                     <p className="mt-0.5 whitespace-nowrap tabular-nums text-muted">{l.telephone}{l.ville ? ` · ${l.ville}` : ''}</p>
-                    {l.utm_source && <div className="mt-1"><SourceTag lead={l} /></div>}
+                    {isCapiLead(l) && <div className="mt-1"><SourceTag lead={l} /></div>}
                   </td>
                   <td className="px-3 py-3">
                     <span className="block min-w-[6.5rem] max-w-[9rem] text-ink">{l[ITEM.key] || '—'}</span>
