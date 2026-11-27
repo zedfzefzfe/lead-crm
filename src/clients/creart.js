@@ -40,14 +40,14 @@ export default {
   sourceLabels: { landing: 'Landing page', whatsapp: 'WhatsApp', instagram: 'Instagram', autre: 'Autre' },
 
   // What the lead is interested in (column name in the leads table).
-  item: { key: 'atelier', label: 'Atelier', plural: 'ateliers', default: 'Bougies Casa 15 Nov', options: ['Bougies Casa 15 Nov', 'Bougies Tanger 21 Nov'] },
+  item: { key: 'atelier', label: 'Atelier', plural: 'ateliers', default: 'Bougies Casa 12 Déc', options: ['Bougies Casa 12 Déc', 'Bougies Casa 26 Déc', 'Bougies Casa 15 Nov', 'Bougies Tanger 21 Nov'] },
   // Focus: the CRM shows only these ateliers (each = words that must all be in the atelier name).
   // Other leads are hidden, never deleted; "Afficher tous les ateliers" on the Leads page shows them.
   focusAteliers: [
-    { key: 'casa', label: 'Casa 15 Nov', words: ['casa', '15 nov'] },
-    { key: 'tanger', label: 'Tanger 21 Nov', words: ['tanger', '21 nov'] },
+    { key: 'casa12dec', label: 'Casa 12 Déc', words: ['casa', '12 dec'] },
+    { key: 'casa26dec', label: 'Casa 26 Déc', words: ['casa', '26 dec'] },
   ],
-  focusLabel: 'Casa 15 Nov · Tanger 21 Nov',
+  focusLabel: 'Casa 12 Déc · Casa 26 Déc',
   extraFields: [], // more dropdown fields, e.g. payment method
   showAcompte: true,
   showContactPref: true, // "Contact souhaité" column, filled by the landing page pop-up
