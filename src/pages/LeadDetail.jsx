@@ -5,6 +5,7 @@ import { useLeads } from '../lib/leads'
 import { CLIENT, EXTRA_FIELDS, ITEM, STATUTS, RAISONS, SOURCE_LABELS, FIELD_LABELS } from '../lib/constants'
 import { formatDate, formatDateTime, formatMAD, telLink, whatsappLink } from '../lib/format'
 import StatusBadge from '../components/StatusBadge'
+import SourceTag from '../components/SourceTag'
 import DeleteLeadButton from '../components/DeleteLeadButton'
 import { CallAttempts, isRelanceLead } from '../components/CallAttempts'
 import { t, tv } from '../lib/i18n'
@@ -56,6 +57,7 @@ export default function LeadDetail() {
             <div className="mt-0.5 flex items-center gap-2 text-[13px] text-muted">
               <StatusBadge statut={lead.statut} />
               {lead[ITEM.key] && <span>{lead[ITEM.key]}</span>}
+              <SourceTag lead={lead} />
             </div>
           </div>
         </div>

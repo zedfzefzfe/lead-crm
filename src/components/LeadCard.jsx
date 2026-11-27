@@ -3,6 +3,7 @@ import { CLIENT, EXTRA_FIELDS, ITEM, SOURCE_LABELS } from '../lib/constants'
 import { formatDate, telLink } from '../lib/format'
 import { canMarkEligible, EligibleToggle, NoteEditor, RelanceInput, StatusSelect } from './QuickEdit'
 import ContactPref from './ContactPref'
+import SourceTag from './SourceTag'
 import { t, tv } from '../lib/i18n'
 
 // Lead card used on mobile and on the "À relancer" page.
@@ -26,6 +27,7 @@ export default function LeadCard({ lead, extra }) {
             {lead.telephone}
           </a>
           {lead.ville && <span className="text-[13px] text-muted"> · {lead.ville}</span>}
+          {lead.utm_source && <div className="mt-1"><SourceTag lead={lead} /></div>}
         </div>
         <div className="flex w-40 shrink-0 flex-col items-end gap-2">
           <StatusSelect lead={lead} />
